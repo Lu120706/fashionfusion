@@ -102,58 +102,6 @@ def create_admin():
         return "Usuario administrador creado 🎉"
     else:
         return "El usuario administrador ya existe ✅"
-    
-@app.route('/debug/session')
-def debug_session():
-    from flask import session
-    return {
-        "session": dict(session)
-    }
-
-@app.route('/debug/users')
-def debug_users():
-    from models import Usuario
-    users = Usuario.query.all()
-    return {
-        "usuarios": [
-            {
-                "id_usuario": u.id_usuario,
-                "nombre": u.nombre,
-                "id_rol": int(u.id_rol)
-            } for u in users
-        ]
-    }
-
-@app.route('/debug/env')
-def debug_env():
-    import os
-    return {
-        "SECRET_KEY": os.environ.get("SECRET_KEY"),
-        "session_test": app.config.get("SECRET_KEY")
-    }
-
-@app.route('/debug/auth')
-def debug_auth():
-    from flask_login import current_user
-    return {
-        "authenticated": current_user.is_authenticated,
-        "current_user": current_user.get_id(),
-        "session": dict(session)
-    }
-
-@app.route('/debug/role-check')
-def debug_role_check():
-    from flask_login import current_user
-    from flask import session
-
-    role = session.get('role')
-    return {
-        "authenticated": current_user.is_authenticated,
-        "current_user": current_user.get_id(),
-        "session_role": role,
-        "required_role": 1,
-        "access_granted": (role is not None and int(role) == 1)
-    }
 
 # Ejecutar servidor
 if __name__ == "__main__":
