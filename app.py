@@ -126,6 +126,20 @@ def debug_auth():
         "session": dict(session)
     }
 
+@app.route('/debug/role-check')
+def debug_role_check():
+    from flask_login import current_user
+    from flask import session
+
+    role = session.get('role')
+    return {
+        "authenticated": current_user.is_authenticated,
+        "current_user": current_user.get_id(),
+        "session_role": role,
+        "required_role": 1,
+        "access_granted": (role is not None and int(role) == 1)
+    }
+
 # Ejecutar servidor
 if __name__ == "__main__":
     app.run(debug=True)

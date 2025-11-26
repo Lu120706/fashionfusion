@@ -5,6 +5,7 @@ def role_required(required_role):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
+            print("DEBUG session:", dict(session))
             if 'role' not in session or int(session['role']) != int(required_role):
                 flash("🚫 No tienes permisos para acceder a esta sección.", "danger")
                 return redirect(url_for('index'))
