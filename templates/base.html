@@ -51,7 +51,7 @@
                     {% set username = current_user.nombre if current_user.nombre is defined else current_user.get_id() %}
                     {% set user_role = current_user.id_rol if current_user.id_rol is defined else None %}
 
-                    {% if user_role in ('a','A','admin') %}
+                    {% if session.get('role') == 1 %}
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('usuarios.admin_users') }}">Usuarios</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('productos.admin_products') }}">Productos</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('rol.listar_roles') }}">Roles</a></li>
