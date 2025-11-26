@@ -40,7 +40,7 @@ class Producto(db.Model):
     talla = db.Column(db.String(20))
     color = db.Column(db.String(25))
     precio_producto = db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
-    disponibilidad = db.Column(db.Enum('SI', 'NO'), nullable=False, default='SI')
+    disponibilidad = db.Column(db.Enum('SI', 'NO', name='disponibilidad_enum'), nullable=False, default='SI')
     stock = db.Column(db.Integer, nullable=False, default=0)
     foto_producto = db.Column(db.String(255), nullable=True)
     creado_en = db.Column(db.DateTime, default=datetime.utcnow)
@@ -51,7 +51,7 @@ class Factura(db.Model):
     id_factura = db.Column(db.Integer, primary_key=True)
     id_usuario = db.Column(db.String(15), db.ForeignKey('usuarios.id_usuario'), nullable=False)
     direccion_envio = db.Column(db.String(255), nullable=False)
-    estado = db.Column(db.Enum('pendiente', 'pagada', 'enviada', 'cancelada'), default='pendiente')
+    estado = db.Column(db.Enum('pendiente', 'pagada', 'enviada', 'cancelada', name='estado_enum'), default='pendiente')
     total = db.Column(db.Numeric(10, 2), nullable=False)
     creado_en = db.Column(db.DateTime, default=datetime.utcnow)
 
