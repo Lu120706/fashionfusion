@@ -20,7 +20,7 @@ def login():
             login_user(user)
             session.permanent = True
             session['username'] = user.id_usuario
-            session['role'] = user.tipo_usuario
+            session["role"] = user.id_rol
 
             if username not in SHOPPING_CARTS:
                 SHOPPING_CARTS[username] = []

@@ -17,7 +17,6 @@ class Usuario(db.Model, UserMixin):
     contrasena = db.Column(db.String(255))
     direccion = db.Column(db.String(255))
     id_rol = db.Column(db.Integer, db.ForeignKey('rol.id_rol'))
-    tipo_usuario = db.Column(db.String(1), nullable=False, default='u') 
     creado_en = db.Column(db.DateTime, server_default=db.func.now())
     actualizado_en = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
 
