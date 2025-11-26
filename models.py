@@ -17,7 +17,7 @@ class Usuario(db.Model, UserMixin):
     correo = db.Column(db.String(150), unique=True)
     contrasena = db.Column(db.String(255))
     direccion = db.Column(db.String(255))
-    id_rol = db.Column(db.String(1), db.ForeignKey('rol.id_rol'))
+    id_rol = db.Column(db.Integer, db.ForeignKey('rol.id_rol'))
     creado_en = db.Column(db.DateTime, server_default=db.func.now())
     actualizado_en = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
 
@@ -45,7 +45,6 @@ class Producto(db.Model):
     foto_producto = db.Column(db.String(255), nullable=True)
     creado_en = db.Column(db.DateTime, default=datetime.utcnow)
 
-
 class Factura(db.Model):
     __tablename__ = 'factura'
     id_factura = db.Column(db.Integer, primary_key=True)
@@ -54,7 +53,6 @@ class Factura(db.Model):
     estado = db.Column(db.Enum('pendiente', 'pagada', 'enviada', 'cancelada', name='estado_enum'), default='pendiente')
     total = db.Column(db.Numeric(10, 2), nullable=False)
     creado_en = db.Column(db.DateTime, default=datetime.utcnow)
-
 
 class FacturaItem(db.Model):
     __tablename__ = 'factura_items'
