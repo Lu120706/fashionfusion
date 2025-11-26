@@ -7,7 +7,7 @@ itsdangerous>=2.2.0
 Flask-SQLAlchemy>=3.0
 PyMySQL>=1.1.0
 
-# Migraciones de base de datos (opcional pero recomendado)
+# Migraciones de base de datos
 Flask-Migrate>=4.0
 
 # Manejo de contraseñas seguras
@@ -16,11 +16,14 @@ bcrypt>=4.0
 # Manejo de sesiones y login
 Flask-Login>=0.6.3
 
-# Envío de correos (si tu proyecto lo usa)
+# Envío de correos
 Flask-Mail==0.10.0
 
-# Generación de PDF (para facturas, reportes, etc.)
+# Generación de PDF
 xhtml2pdf>=0.2.10
 
-# Para depuración opcional o logs de desarrollo
+# Variables de entorno
 python-dotenv>=1.0.0
+
+# Servidor de producción
+gunicorn>=21.2.0
