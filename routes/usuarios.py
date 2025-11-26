@@ -20,14 +20,14 @@ def login():
             login_user(user)
             session.permanent = True
             session['username'] = user.id_usuario
-            session['role'] = user.id_rol
+            session['role'] = user.tipo_usuario
 
             if username not in SHOPPING_CARTS:
                 SHOPPING_CARTS[username] = []
             session['cart'] = SHOPPING_CARTS[username]
 
             flash('¡Bienvenido!', 'success')
-            return redirect(url_for('usuarios.admin_users') if user.id_rol == 'a' else url_for('index'))
+            return redirect(url_for('usuarios.admin_users') if user.tipo_usuario == 'a' else url_for('index'))
 
         flash('Usuario o contraseña incorrectos', 'danger')
     return render_template('login.html')
