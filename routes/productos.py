@@ -17,14 +17,14 @@ productos_bp = Blueprint("productos", __name__, url_prefix="/productos")
 # -----------------------
 
 @productos_bp.route('/admin/productos')
-@role_required('1')
+@role_required(1)
 def admin_products():
     productos = Producto.query.order_by(Producto.creado_en.desc()).all()
     return render_template('admin_products.html', productos=productos)
 
 
 @productos_bp.route('/admin/productos/new', methods=['GET', 'POST'])
-@role_required('1')
+@role_required(1)
 def admin_create_product():
     if request.method == 'POST':
         nombre = request.form.get('nombre', '').strip()
@@ -84,7 +84,7 @@ def admin_create_product():
 
 
 @productos_bp.route('/admin/productos/edit/<int:id_producto>', methods=['GET', 'POST'])
-@role_required('1')
+@role_required(1)
 def admin_edit_product(id_producto):
     producto = Producto.query.get_or_404(id_producto)
 
@@ -132,7 +132,7 @@ def admin_edit_product(id_producto):
 
 
 @productos_bp.route('/admin/productos/delete/<int:id_producto>', methods=['POST'])
-@role_required('1')
+@role_required(1)
 def admin_delete_product(id_producto):
     producto = Producto.query.get_or_404(id_producto)
     db.session.delete(producto)
