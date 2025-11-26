@@ -90,7 +90,10 @@ def create_admin():
     
 @app.route('/debug/session')
 def debug_session():
-    return str(session)
+    from flask import session
+    return {
+        "session": dict(session)
+    }
 
 @app.route('/debug/users')
 def debug_users():
