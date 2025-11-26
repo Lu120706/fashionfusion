@@ -27,7 +27,7 @@ def login():
             session['cart'] = SHOPPING_CARTS[username]
 
             flash('¡Bienvenido!', 'success')
-            return redirect(url_for('usuarios.admin_users') if user.tipo_usuario == 'a' else url_for('index'))
+            return redirect(url_for('usuarios.admin_users') if user.id_rol == 1 else url_for('index'))
 
         flash('Usuario o contraseña incorrectos', 'danger')
     return render_template('login.html')
@@ -46,14 +46,14 @@ def logout():
 # CRUD DE USUARIOS (solo admin)
 # -----------------------
 @usuarios_bp.route('/admin/users')
-@role_required('a')  # ✅ cambio mínimo aquí
+@role_required('1')  # ✅ cambio mínimo aquí
 def admin_users():
     users = Usuario.query.order_by(Usuario.creado_en.desc()).all()
     return render_template('admin_users.html', users=users)
 
 
 @usuarios_bp.route('/admin/users/new', methods=['GET', 'POST'])
-@role_required('a')  # ✅ cambio mínimo aquí
+@role_required('1')  # ✅ cambio mínimo aquí
 def admin_create_user():
     if request.method == 'POST':
         id_usuario = request.form['id_usuario'].strip()
@@ -93,7 +93,7 @@ def admin_create_user():
 
 
 @usuarios_bp.route('/admin/users/edit/<string:id_usuario>', methods=['GET', 'POST'])
-@role_required('a')  # ✅ cambio mínimo aquí
+@role_required('1')  # ✅ cambio mínimo aquí
 def admin_edit_user(id_usuario):
     user = Usuario.query.get_or_404(id_usuario)
 
@@ -140,7 +140,7 @@ def admin_edit_user(id_usuario):
 
 
 @usuarios_bp.route('/admin/users/delete/<string:id_usuario>', methods=['POST'])
-@role_required('a')  # ✅ cambio mínimo aquí
+@role_required('1')  # ✅ cambio mínimo aquí
 def admin_delete_user(id_usuario):
     if id_usuario == session.get('username'):
         flash('No puedes eliminarte a ti mismo', 'warning')
