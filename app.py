@@ -54,6 +54,21 @@ def create_app():
 # Crear instancia de la aplicación
 app = create_app()
 
+def create_default_roles():
+    try:
+        if not Rol.query.filter_by(nombre='admin').first():
+            r_admin = Rol(id_rol=1, nombre='admin')
+            db.session.add(r_admin)
+
+        if not Rol.query.filter_by(nombre='user').first():
+            r_user = Rol(id_rol=2, nombre='user')
+            db.session.add(r_user)
+
+        db.session.commit()
+        print("✅ Roles creados: admin=1, user=2")
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error creando roles: {e}")
 
 # Ruta raíz (por si el blueprint de home no la maneja)
 @app.route('/')
