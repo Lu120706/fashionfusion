@@ -92,16 +92,6 @@ def create_admin():
 def debug_session():
     return str(session)
 
-@app.route('/debug/env')
-def debug_env():
-    import os
-    return {
-        "SECRET_KEY": os.environ.get("SECRET_KEY"),
-        "MAIL_USERNAME": os.environ.get("MAIL_USERNAME"),
-        "MAIL_PASSWORD": os.environ.get("MAIL_PASSWORD"),
-        "DATABASE_URL": os.environ.get("DATABASE_URL")
-    }
-
 @app.route('/debug/users')
 def debug_users():
     from models import Usuario
