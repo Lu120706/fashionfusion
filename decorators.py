@@ -5,7 +5,7 @@ def role_required(required_role):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            if 'role' not in session or session['role'] != required_role:
+            if 'role' not in session or int(session['role']) != int(required_role):
                 flash("🚫 No tienes permisos para acceder a esta sección.", "danger")
                 return redirect(url_for('index'))
             return f(*args, **kwargs)
@@ -20,3 +20,4 @@ def find_or_create_role(db, Rol, nombre):
         db.session.add(role)
         db.session.commit()
     return role
+

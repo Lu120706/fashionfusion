@@ -14,7 +14,7 @@ from routes import (
     home_bp
 )
 from globals import SHOPPING_CARTS
-
+from flask import session
 
 def create_app():
     # Crear la aplicación Flask con las carpetas correctas
@@ -87,6 +87,10 @@ def create_admin():
         return "Usuario administrador creado 🎉"
     else:
         return "El usuario administrador ya existe ✅"
+    
+@app.route('/debug/session')
+def debug_session():
+    return str(session)
 
 # Ejecutar servidor
 if __name__ == "__main__":
