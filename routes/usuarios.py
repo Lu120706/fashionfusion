@@ -20,7 +20,7 @@ def login():
             login_user(user)
             session.permanent = True
             session['username'] = user.id_usuario
-            session["role"] = int(user.id_rol)
+            session['role'] = int(user.id_rol) 
 
             if username not in SHOPPING_CARTS:
                 SHOPPING_CARTS[username] = []
@@ -31,7 +31,6 @@ def login():
 
         flash('Usuario o contraseña incorrectos', 'danger')
     return render_template('login.html')
-
 
 @usuarios_bp.route('/logout')
 def logout():

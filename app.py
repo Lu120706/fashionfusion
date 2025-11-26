@@ -116,6 +116,23 @@ def debug_users():
         ]
     }
 
+@app.route('/debug/env')
+def debug_env():
+    import os
+    return {
+        "SECRET_KEY": os.environ.get("SECRET_KEY"),
+        "session_test": app.config.get("SECRET_KEY")
+    }
+
+@app.route('/debug/auth')
+def debug_auth():
+    from flask_login import current_user
+    return {
+        "authenticated": current_user.is_authenticated,
+        "current_user": current_user.get_id(),
+        "session": dict(session)
+    }
+
 # Ejecutar servidor
 if __name__ == "__main__":
     app.run(debug=True)
