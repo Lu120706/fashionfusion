@@ -32,7 +32,7 @@ def create_app():
     login_manager.login_view = 'registro.login'  # Nombre del blueprint y la función de login
     @login_manager.user_loader
     def load_user(user_id):
-        return Usuario.query.get(int(user_id))
+        return Usuario.query.get(user_id)
 
     # Registrar Blueprints
     app.register_blueprint(contraseña_bp)
