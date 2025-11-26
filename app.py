@@ -102,9 +102,9 @@ def debug_env():
         "DATABASE_URL": os.environ.get("DATABASE_URL")
     }
 
-@usuarios_bp.route('/debug/users')
+@app.route('/debug/users')
 def debug_users():
-    from models import Usuario  # Ajusta si tu modelo está en otro archivo
+    from models import Usuario
     users = Usuario.query.all()
     return {
         "usuarios": [
