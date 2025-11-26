@@ -13,7 +13,7 @@ def listar_roles():
     return render_template("admin_rol.html", roles=roles)
 
 @rol_bp.route("/roles/crear", methods=["POST"])
-@role_required('admin')
+@role_required('a')
 def crear_rol():
     id_rol = request.form["id_rol"]
     nombre = request.form["nombre"]
@@ -29,7 +29,7 @@ def crear_rol():
     return redirect(url_for("rol.listar_roles"))
 
 @rol_bp.route("/roles/editar/<id>", methods=["GET", "POST"])
-@role_required('admin')
+@role_required('a')
 def editar_rol(id):
     rol = Rol.query.filter_by(id_rol=str(id)).first()
     if not rol:
@@ -54,7 +54,7 @@ def editar_rol(id):
     return render_template("roles_edit.html", rol=rol)
 
 @rol_bp.route("/roles/eliminar/<id>", methods=["POST"])
-@role_required('admin')
+@role_required('a')
 def eliminar_rol(id):
     rol = Rol.query.filter_by(id_rol=str(id)).first()
     if not rol:
