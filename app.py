@@ -60,7 +60,35 @@ app = create_app()
 def index():
     return render_template('index.html')
 
+@app.route('/create-admin')
+def create_admin():
+    from models import Usuario, Rol, db
+
+    # Verificar si ya existe el rol "admin"
+    admin_role = Rol.query.filter_by(nombre='admin').first()
+    if not admin_role:
+        admin_role = Rol(nombre='admin')
+        db.session.add(admin_role)
+        db.session.commit()
+
+    # Verificar si ya existe el usuario admin
+    admin_user = Usuario.query.filter_by(correo='admin@fashionfusion.com').first()
+    if not admin_user:
+        admin_user = Usuario(
+            id_usuario='admin01',
+            nombre='Administrador',
+            correo='admin@fashionfusion.com',
+            direccion='Oficina Central',
+            id_rol=admin_role.id_rol
+        )
+        admin_user.set_password('admin123')  # 🔑 Contraseña inicial
+        db.session.add(admin_user)
+        db.session.commit()
+        return "Usuario administrador creado 🎉"
+    else:
+        return "El usuario administrador ya existe ✅"
 
 # Ejecutar servidor
 if __name__ == "__main__":
     app.run(debug=True)
+
