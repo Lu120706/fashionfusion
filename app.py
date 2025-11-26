@@ -102,6 +102,20 @@ def debug_env():
         "DATABASE_URL": os.environ.get("DATABASE_URL")
     }
 
+@usuarios_bp.route('/debug/users')
+def debug_users():
+    from models import Usuario  # Ajusta si tu modelo está en otro archivo
+    users = Usuario.query.all()
+    return {
+        "usuarios": [
+            {
+                "id_usuario": u.id_usuario,
+                "nombre": u.nombre,
+                "id_rol": int(u.id_rol)
+            } for u in users
+        ]
+    }
+
 # Ejecutar servidor
 if __name__ == "__main__":
     app.run(debug=True)
