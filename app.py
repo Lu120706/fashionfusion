@@ -87,15 +87,6 @@ def create_admin():
         return "Usuario administrador creado 🎉"
     else:
         return "El usuario administrador ya existe ✅"
-    
-@app.route('/fix-admin-role')
-def fix_admin_role():
-    admin = Usuario.query.filter_by(correo='admin@fashionfusion.com').first()
-    if admin:
-        admin.rol = 'a'
-        db.session.commit()
-        return "Rol del admin actualizado a 'a' ✅"
-    return "No se encontró el usuario admin ❌"
 
 # Ejecutar servidor
 if __name__ == "__main__":
