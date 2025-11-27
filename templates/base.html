@@ -5,87 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Fashion Fusion{% endblock %}</title>
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+   <!-- Bootstrap -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
-        body { background: #fafafa; margin: 0; }
-        .brand-bar {
-            background: linear-gradient(90deg, #111827, #374151);
-            color: white;
-        }
-        .brand-bar .nav-link { color: #fff; padding: 0.25rem 0.5rem; }
-        .brand-bar .nav-link:hover { color: #e5e7eb; text-decoration: underline; }
-        .brand-bar .nav { gap: 0.8rem; align-items: center; }
-        footer { padding: 2rem 0; text-align: center; color: #6b7280; }
-        .nav .badge-cart { font-size: .8rem; vertical-align: middle; }
-    </style>
+   <style>
+       body { 
+           background: #fafafa; 
+           margin: 0; 
+           box-sizing: border-box; 
+           overflow-x: hidden; /* evita que se desborde horizontalmente */
+       }
+   
+       .brand-bar {
+           background: linear-gradient(90deg, #111827, #374151);
+           color: white;
+           padding: 0.5rem; /* agrega espacio interno para móviles */
+       }
+   
+       .brand-bar .nav-link { 
+           color: #fff; 
+           padding: 0.25rem 0.5rem; 
+           text-decoration: none;
+       }
+   
+       .brand-bar .nav-link:hover { 
+           color: #e5e7eb; 
+           text-decoration: underline; 
+       }
+   
+       .brand-bar .nav { 
+           gap: 0.8rem; 
+           align-items: center; 
+           flex-wrap: wrap; /* permite que los links bajen en móviles */
+       }
+   
+       footer { 
+           padding: 2rem 0; 
+           text-align: center; 
+           color: #6b7280; 
+       }
+   
+       .nav .badge-cart { 
+           font-size: .8rem; 
+           vertical-align: middle; 
+       }
+   
+       /* 📱 Ajustes para pantallas pequeñas */
+       @media (max-width: 768px) {
+           .brand-bar .nav {
+               flex-direction: column; /* menú en columna en móviles */
+               align-items: flex-start;
+           }
+   
+           .brand-bar .nav-link {
+               display: block;
+               width: 100%; /* cada link ocupa todo el ancho */
+               padding: 0.5rem;
+           }
+   
+           table {
+               width: 100%;
+               border-collapse: collapse;
+           }
+   
+           .table-responsive {
+               overflow-x: auto; /* scroll horizontal si la tabla es muy grande */
+           }
+   
+           .acciones {
+               display: flex;
+               flex-direction: column;
+               gap: 10px;
+           }
+       }
+   </style>
 
-    {% block extra_css %}{% endblock %}
+   {% block extra_css %}{% endblock %}
 </head>
 
 <body>
-    <nav class="brand-bar py-3">
-        <div class="container d-flex justify-content-between align-items-center">
-            <h1 class="h4 mb-0">
-                <a href="{{ url_for('home.index') }}" class="text-white text-decoration-none">Fashion Fusion</a>
-            </h1>
+   <nav class="brand-bar py-3">
+       <div class="container d-flex justify-content-between align-items-center">
+           <h1 class="h4 mb-0">
+               <a href="{{ url_for('home.index') }}" class="text-white text-decoration-none">Fashion Fusion</a>
+           </h1>
 
-            <ul class="nav mb-0">
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('home.index') }}">Inicio</a></li>
+           <ul class="nav mb-0">
+               <li class="nav-item"><a class="nav-link" href="{{ url_for('home.index') }}">Inicio</a></li>
 
-                <!-- Catálogo público: asegúrate de tener productos.catalogo (o cambia aquí al endpoint correcto) -->
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('productos.catalogo') }}">Catálogo</a></li>
+               <!-- Catálogo público: asegúrate de tener productos.catalogo (o cambia aquí al endpoint correcto) -->
+               <li class="nav-item"><a class="nav-link" href="{{ url_for('productos.catalogo') }}">Catálogo</a></li>
 
-                <!-- Carrito: endpoint 'carrito.cart' -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('carrito.cart') }}">
-                        Carrito
-                        {% if session.get('cart') %}
-                            <span class="badge bg-danger badge-cart">{{ session['cart']|length }}</span>
-                        {% endif %}
-                    </a>
-                </li>
+               <!-- Carrito: endpoint 'carrito.cart' -->
+               <li class="nav-item">
+                   <a class="nav-link" href="{{ url_for('carrito.cart') }}">
+                       Carrito
+                       {% if session.get('cart') %}
+                           <span class="badge bg-danger badge-cart">{{ session['cart']|length }}</span>
+                       {% endif %}
+                   </a>
+               </li>
 
-                {% if current_user.is_authenticated %}
-                    {% set username = current_user.nombre if current_user.nombre is defined else current_user.get_id() %}
-                    {% set user_role = current_user.id_rol if current_user.id_rol is defined else None %}
+               {% if current_user.is_authenticated %}
+                   {% set username = current_user.nombre if current_user.nombre is defined else current_user.get_id() %}
+                   {% set user_role = current_user.id_rol if current_user.id_rol is defined else None %}
 
-                    {% if session.get('role') == 1 %}
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('usuarios.admin_users') }}">Usuarios</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('productos.admin_products') }}">Productos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('rol.listar_roles') }}">Roles</a></li>
-                    {% endif %}
+                   {% if session.get('role') == 1 %}
+                       <li class="nav-item"><a class="nav-link" href="{{ url_for('usuarios.admin_users') }}">Usuarios</a></li>
+                       <li class="nav-item"><a class="nav-link" href="{{ url_for('productos.admin_products') }}">Productos</a></li>
+                       <li class="nav-item"><a class="nav-link" href="{{ url_for('rol.listar_roles') }}">Roles</a></li>
+                   {% endif %}
 
-                    <li class="nav-item"><span class="nav-link">Hola, {{ username }}</span></li>
+                   <li class="nav-item"><span class="nav-link">Hola, {{ username }}</span></li>
 
-                    <!-- <<--- USO DE RUTAS ABSOLUTAS para evitar BuildError mientras confirmas endpoints ----->
-                    <li class="nav-item"><a class="nav-link" href="/logout">Cerrar sesión</a></li>
-                {% else %}
-                    <!-- Enlace a login con ruta absoluta: cambiar después por url_for('...') cuando confirmes endpoint -->
-                    <li class="nav-item"><a class="nav-link" href="/login">Iniciar sesión</a></li>
-                {% endif %}
-            </ul>
-        </div>
-    </nav>
+                   <!-- <<--- USO DE RUTAS ABSOLUTAS para evitar BuildError mientras confirmas endpoints ----->
+                   <li class="nav-item"><a class="nav-link" href="/logout">Cerrar sesión</a></li>
+               {% else %}
+                   <!-- Enlace a login con ruta absoluta: cambiar después por url_for('...') cuando confirmes endpoint -->
+                   <li class="nav-item"><a class="nav-link" href="/login">Iniciar sesión</a></li>
+               {% endif %}
+           </ul>
+       </div>
+   </nav>
 
-    <main class="container my-5">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+   <main class="container my-5">
+       {% with messages = get_flashed_messages(with_categories=true) %}
+           {% if messages %}
+               {% for category, message in messages %}
+                   <div class="alert alert-{{ category }}">{{ message }}</div>
+               {% endfor %}
+           {% endif %}
+       {% endwith %}
 
-        {% block content %}{% endblock %}
-    </main>
+       {% block content %}{% endblock %}
+   </main>
 
-    <footer>
-        <div class="container"><p class="mb-0">© {{ year }} FASHION FUSION</p></div>
-    </footer>
+   <footer>
+       <div class="container"><p class="mb-0">© {{ year }} FASHION FUSION</p></div>
+   </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    {% block extra_js %}{% endblock %}
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+   {% block extra_js %}{% endblock %}
 </body>
 </html>
