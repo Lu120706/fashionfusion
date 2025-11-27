@@ -52,15 +52,21 @@ def admin_users():
 
 
 @usuarios_bp.route('/admin/users/new', methods=['GET', 'POST'])
-@role_required(1)  # ✅ cambio mínimo aquí
+@role_required(1)  
 def admin_create_user():
     if request.method == 'POST':
         id_usuario = request.form['id_usuario'].strip()
         nombre = request.form['nombre'].strip()
         correo = request.form['correo'].strip()
         password = request.form['password']
-        role = request.form.get('role')
         direccion_db = request.form.get('direccion', '').strip() or ''
+
+        try:
+            role = int(request.form.get('role'))
+        except (TypeError, ValueError):
+            flash('Rol inválido', 'danger')
+            roles = Rol.query.all()
+            return render_template('admin_user_form.html', action='Crear', user=None, roles=roles)
 
         if Usuario.query.filter_by(id_usuario=id_usuario).first():
             flash('El id de usuario ya existe', 'danger')
@@ -76,19 +82,18 @@ def admin_create_user():
         u = Usuario(id_usuario=id_usuario, nombre=nombre, correo=correo, id_rol=r.id_rol, direccion=direccion_db)
         u.set_password(password)
         db.session.add(u)
+
         try:
             db.session.commit()
         except Exception as e:
             db.session.rollback()
+            print(f'Error creando usuario: {e}')  # 👈 esto te ayudará en los logs de Render
             flash(f'Error creando usuario: {e}', 'danger')
             roles = Rol.query.all()
             return render_template('admin_user_form.html', action='Crear', user=None, roles=roles)
 
-        flash('Usuario creado', 'success')
-        return redirect(url_for('usuarios.admin_users'))
-
-    roles = Rol.query.all()
-    return render_template('admin_user_form.html', action='Crear', user=None, roles=roles)
+    flash('Usuario creado', 'success')
+    return redirect(url_for('usuarios.admin_users'))
 
 
 @usuarios_bp.route('/admin/users/edit/<string:id_usuario>', methods=['GET', 'POST'])
