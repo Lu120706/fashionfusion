@@ -19,7 +19,7 @@ from routes.pedidos import pedidos_bp
 
 def create_app():
     # Crear la aplicación Flask con las carpetas correctas
-    app = Flask(__name__, static_folder='style', template_folder='templates')
+    app = Flask(__name__, static_folder='static', template_folder='templates')
 
     # Cargar configuración
     app.config.from_object(Config)
