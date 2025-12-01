@@ -10,7 +10,6 @@ def admin_pedidos():
 
 @pedidos_bp.route('/admin/pedidos/estado/<int:pedido_id>', methods=['POST'])
 def cambiar_estado_pedido(pedido_id):
-    """Permite cambiar el estado de un pedido desde el panel admin."""
     nuevo_estado = request.form.get('estado')
     pedido = Pedido.query.get_or_404(pedido_id)
 
