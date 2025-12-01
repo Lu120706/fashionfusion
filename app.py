@@ -15,6 +15,7 @@ from routes import (
 )
 from globals import SHOPPING_CARTS
 from flask import session
+from pedidos import pedidos_bp
 
 def create_app():
     # Crear la aplicación Flask con las carpetas correctas
@@ -43,6 +44,7 @@ def create_app():
     app.register_blueprint(usuarios_bp)
     app.register_blueprint(carrito_bp)
     app.register_blueprint(home_bp)
+    app.register_blueprint(pedidos_bp)
 
     # Crear las tablas si no existen
     with app.app_context():
