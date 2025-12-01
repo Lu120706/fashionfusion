@@ -76,13 +76,12 @@ class FacturaItem(db.Model):
 
 
 class Pedido(db.Model):
-    __tablename__ = 'pedido'   # nombre de la tabla en la BD
+    __tablename__ = 'pedido'
     id = db.Column(db.Integer, primary_key=True)
     producto = db.Column(db.String(100), nullable=False)
     talla = db.Column(db.String(10), nullable=False)
     direccion = db.Column(db.String(200), nullable=False)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
-
+    usuario_id = db.Column(db.String(15), db.ForeignKey('usuarios.id_usuario'), nullable=False)  # 👈 ahora coincide con Usuario.id_usuario
 
     def __repr__(self):
         return f"<Pedido {self.producto} - {self.talla}>"
