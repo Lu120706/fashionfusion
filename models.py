@@ -81,7 +81,8 @@ class Pedido(db.Model):
     producto = db.Column(db.String(100), nullable=False)
     talla = db.Column(db.String(10), nullable=False)
     direccion = db.Column(db.String(200), nullable=False)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id_usuario'), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
+
 
     def __repr__(self):
         return f"<Pedido {self.producto} - {self.talla}>"
