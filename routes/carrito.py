@@ -167,7 +167,7 @@ def clear_cart():
 @login_required
 def cart_checkout():
     """Procesa la compra, guarda la factura en la base de datos y redirige a la vista de factura."""
-    from models import Factura, FacturaItem, db  # Importamos aquí para evitar ciclos
+    from models import Factura, FacturaItem, Pedido, db  # ✅ Importamos Pedido también
 
     cart = session.get('cart', {})
     if not cart:
@@ -191,7 +191,7 @@ def cart_checkout():
     db.session.add(factura)
     db.session.commit()  # Guarda para obtener el ID
 
-    # Crear los items de la factura
+    # Crear los items de la factura y pedidos
     for item in cart.values():
         subtotal = float(item['precio']) * int(item['cantidad'])
         factura_item = FacturaItem(
@@ -206,11 +206,20 @@ def cart_checkout():
         )
         db.session.add(factura_item)
 
+        # ✅ Guardar también en la tabla Pedido (sin color)
+        pedido = Pedido(
+            producto=item['nombre'],
+            talla=item.get('talla', ''),
+            direccion=direccion_envio,
+            usuario_id=usuario_id
+        )
+        db.session.add(pedido)
+
     db.session.commit()
 
     # Limpiar carrito
     session.pop('cart', None)
     session.modified = True
 
-    flash('Compra realizada con éxito. Tu factura ha sido generada.', 'success')
+    flash('Compra realizada con éxito. Tu factura y pedido han sido generados.', 'success')
     return redirect(url_for('factura.invoice_detail', factura_id=factura.id_factura))

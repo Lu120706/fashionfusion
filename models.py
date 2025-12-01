@@ -1,7 +1,7 @@
 from extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
-from flask_login import UserMixin
+from flask_login import UserMixins
 
 class Rol(db.Model):
     __tablename__ = 'rol'
@@ -71,3 +71,18 @@ class FacturaItem(db.Model):
 
     def calcular_subtotal(self):
         self.subtotal = self.cantidad * self.precio_unitario
+
+
+
+
+class Pedido(db.Model):
+    __tablename__ = 'pedido'   # nombre de la tabla en la BD
+    id = db.Column(db.Integer, primary_key=True)
+    producto = db.Column(db.String(100), nullable=False)
+    talla = db.Column(db.String(10), nullable=False)
+    direccion = db.Column(db.String(200), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id_usuario'), nullable=False)
+
+    def __repr__(self):
+        return f"<Pedido {self.producto} - {self.talla}>"
+
