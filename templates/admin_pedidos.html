@@ -11,6 +11,8 @@
                     <th scope="col">Producto</th>
                     <th scope="col">Talla</th>
                     <th scope="col">Dirección del Cliente</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Acción</th>
                 </tr>
             </thead>
             <tbody>
@@ -20,11 +22,21 @@
                         <td>{{ pedido.producto }}</td>
                         <td>{{ pedido.talla }}</td>
                         <td>{{ pedido.direccion }}</td>
+                        <td>{{ pedido.estado }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('pedidos.cambiar_estado_pedido', pedido_id=pedido.id) }}">
+                                <select name="estado" class="form-select form-select-sm d-inline w-auto">
+                                    <option value="pendiente" {% if pedido.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                                    <option value="finalizado" {% if pedido.estado == 'finalizado' %}selected{% endif %}>Finalizado</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-primary">Actualizar</button>
+                            </form>
+                        </td>
                     </tr>
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="3" class="text-center">No hay pedidos registrados aún.</td>
+                        <td colspan="5" class="text-center">No hay pedidos registrados aún.</td>
                     </tr>
                 {% endif %}
             </tbody>
@@ -32,3 +44,4 @@
     </div>
 </div>
 {% endblock %}
+    
