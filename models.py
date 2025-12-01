@@ -82,7 +82,6 @@ class Pedido(db.Model):
     talla = db.Column(db.String(10), nullable=False)
     direccion = db.Column(db.String(200), nullable=False)
     usuario_id = db.Column(db.String(15), db.ForeignKey('usuarios.id_usuario'), nullable=False)
-    estado = db.Column(db.Enum('pendiente', 'finalizado', name='estado_pedido_enum'), default='pendiente')
 
     def __repr__(self):
         return f"<Pedido {self.producto} - {self.talla}>"
