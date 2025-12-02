@@ -3,11 +3,15 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from extensions import db
 from models import Usuario, Rol
 from decorators import find_or_create_role
-from flask_login import login_user
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import login_user, logout_user
+from werkzeug.security import check_password_hash
 
-registro_bp = Blueprint('registro', __name__)
+# Blueprint de registro/autenticación
+registro_bp = Blueprint('registro', __name__, url_prefix='/registro')
 
+# -----------------------
+# REGISTRO DE USUARIO
+# -----------------------
 @registro_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -38,21 +42,21 @@ def register():
             return render_template('register.html')
 
         # Crear usuario
-        direccion_db = direccion if direccion else ''
         nuevo_usuario = Usuario(
             id_usuario=id_usuario,
             nombre=nombre,
             correo=correo,
-            direccion=direccion_db,
+            direccion=direccion,
             id_rol=rol_user.id_rol
         )
+        # Método set_password debe guardar el hash en usuario.contrasena
         nuevo_usuario.set_password(password)
 
         db.session.add(nuevo_usuario)
         try:
             db.session.commit()
             flash('✅ Registro exitoso. Ya puedes iniciar sesión.', 'success')
-            return redirect(url_for('registro.login'))  # correcto con tu blueprint
+            return redirect(url_for('registro.login'))
         except Exception as e:
             db.session.rollback()
             flash(f'❌ Error al guardar el usuario: {e}', 'danger')
@@ -61,22 +65,38 @@ def register():
     return render_template('register.html')
 
 
-
+# -----------------------
+# LOGIN DE USUARIO
+# -----------------------
 @registro_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        usuario = Usuario.query.filter_by(id_usuario=request.form['id_usuario']).first()
+        id_usuario = request.form['id_usuario'].strip()
+        contrasena = request.form['contrasena']
 
-        if usuario and check_password_hash(usuario.contrasena, request.form['contrasena']):
+        usuario = Usuario.query.filter_by(id_usuario=id_usuario).first()
+
+        if usuario and check_password_hash(usuario.contrasena, contrasena):
             login_user(usuario)
 
-            # 🔥 IMPORTANTE: Guardar el rol en la sesión
-            session["role"] = usuario.id_rol 
+            # Guardar datos en sesión
+            session["role"] = usuario.id_rol
             session["user_id"] = usuario.id_usuario
 
             flash("Inicio de sesión exitoso", "success")
-            return redirect(url_for('home.index'))  # o la ruta que uses para el inicio
+            return redirect(url_for('home.index'))
         else:
             flash("Usuario o contraseña incorrectos", "danger")
 
     return render_template('login.html')
+
+
+# -----------------------
+# LOGOUT DE USUARIO
+# -----------------------
+@registro_bp.route('/logout')
+def logout():
+    logout_user()
+    session.clear()
+    flash("Sesión cerrada correctamente", "info")
+    return redirect(url_for('home.index'))

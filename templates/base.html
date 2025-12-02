@@ -13,70 +13,49 @@
             background: #fafafa; 
             margin: 0; 
             box-sizing: border-box; 
-            overflow-x: hidden; /* evita que se desborde horizontalmente */
+            overflow-x: hidden;
         }
-    
         .brand-bar {
             background: linear-gradient(90deg, #111827, #374151);
             color: white;
-            padding: 0.5rem; /* espacio interno para móviles */
+            padding: 0.5rem;
         }
-    
         .brand-bar .nav-link { 
             color: #fff; 
             padding: 0.25rem 0.5rem; 
             text-decoration: none;
         }
-    
         .brand-bar .nav-link:hover { 
             color: #e5e7eb; 
             text-decoration: underline; 
         }
-    
         .brand-bar .nav { 
             gap: 0.8rem; 
             align-items: center; 
-            flex-wrap: wrap; /* permite que los links bajen en móviles */
+            flex-wrap: wrap;
         }
-    
         footer { 
             padding: 2rem 0; 
             text-align: center; 
             color: #6b7280; 
         }
-    
         .nav .badge-cart { 
             font-size: .8rem; 
             vertical-align: middle; 
         }
-    
-        /* 📱 Ajustes para pantallas pequeñas */
         @media (max-width: 768px) {
             .brand-bar .nav {
-                flex-direction: column; /* menú en columna en móviles */
+                flex-direction: column;
                 align-items: flex-start;
             }
-    
             .brand-bar .nav-link {
                 display: block;
-                width: 100%; /* cada link ocupa todo el ancho */
+                width: 100%;
                 padding: 0.5rem;
             }
-    
-            table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-    
-            .table-responsive {
-                overflow-x: auto; /* scroll horizontal si la tabla es muy grande */
-            }
-    
-            .acciones {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
+            table { width: 100%; border-collapse: collapse; }
+            .table-responsive { overflow-x: auto; }
+            .acciones { display: flex; flex-direction: column; gap: 10px; }
         }
     </style>
 
@@ -114,9 +93,11 @@
                     {% endif %}
 
                     <li class="nav-item"><span class="nav-link">Hola, {{ username }}</span></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Cerrar sesión</a></li>
+                    <!-- ✅ Ajustado a blueprint de registro -->
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('registro.logout') }}">Cerrar sesión</a></li>
                 {% else %}
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Iniciar sesión</a></li>
+                    <!-- ✅ Ajustado a blueprint de registro -->
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('registro.login') }}">Iniciar sesión</a></li>
                 {% endif %}
             </ul>
         </div>

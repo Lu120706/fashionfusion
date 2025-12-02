@@ -8,7 +8,7 @@
                 <h2 class="card-title text-center mb-4">Iniciar Sesión</h2>
                 <form method="POST" action="{{ url_for('registro.login') }}">
                     <div class="mb-3">
-                        <label for="id_usuario" class="form-label">Numero de identificacion</label>
+                        <label for="id_usuario" class="form-label">Número de identificación</label>
                         <input type="text" class="form-control" id="id_usuario" name="id_usuario" required>
                     </div>
 
@@ -22,9 +22,10 @@
                     </div>
                 </form>
 
-                <p class="text-center mt-2">
-                    <a href="{{ url_for('contraseña.forgot_password') }}">¿Olvidaste tu contraseña?</a>
-                </p>
+                <!-- Si implementas recuperación de contraseña, ajusta el endpoint aquí -->
+                {# <p class="text-center mt-2">
+                    <a href="{{ url_for('registro.forgot_password') }}">¿Olvidaste tu contraseña?</a>
+                </p> #}
 
                 <p class="text-center mt-3">
                     ¿No tienes cuenta? <a href="{{ url_for('registro.register') }}">Regístrate aquí</a>
