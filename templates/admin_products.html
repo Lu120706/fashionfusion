@@ -10,7 +10,6 @@
         <th>Nombre</th>
         <th>Categoría</th>
         <th>Talla</th>
-        <th>Color</th>
         <th>Precio</th>
         <th>Stock</th>
         <th>Disponibilidad</th>
@@ -23,8 +22,7 @@
         <td>{{ p.nombre }}</td>
         <td>{{ p.categoria }}</td>
         <td>{{ p.talla }}</td>
-        <td>{{ p.color }}</td>
-        <td>${{ p.precio_producto }}</td>
+        <td>${{ "%.2f"|format(p.precio_producto) }}</td>
         <td>{{ p.stock }}</td>
         <td>{{ p.disponibilidad }}</td>
         <td>

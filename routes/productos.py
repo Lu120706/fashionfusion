@@ -8,7 +8,6 @@ import os
 from extensions import db
 from models import Producto
 from decorators import role_required  # asumes que este decorador existe y usa session
-import base64
 
 productos_bp = Blueprint("productos", __name__, url_prefix="/productos")
 
@@ -31,7 +30,6 @@ def admin_create_product():
         descripcion = request.form.get('descripcion', '').strip()
         categoria = request.form.get('categoria', '').strip()
         talla = request.form.get('talla', '').strip()
-        color = request.form.get('color', '').strip()
 
         try:
             precio = float(request.form.get('precio_producto', 0))
@@ -63,7 +61,6 @@ def admin_create_product():
             descripcion=descripcion,
             categoria=categoria,
             talla=talla,
-            color=color,
             precio_producto=precio,
             disponibilidad=disponibilidad,
             stock=stock,
@@ -93,7 +90,6 @@ def admin_edit_product(id_producto):
         producto.descripcion = request.form.get('descripcion', producto.descripcion).strip()
         producto.categoria = request.form.get('categoria', producto.categoria).strip()
         producto.talla = request.form.get('talla', producto.talla).strip()
-        producto.color = request.form.get('color', producto.color).strip()
 
         try:
             producto.precio_producto = float(request.form.get('precio_producto', producto.precio_producto))
@@ -107,7 +103,7 @@ def admin_edit_product(id_producto):
         except:
             pass
 
-        # Si suben nueva foto, replaca archivo
+        # Si suben nueva foto, reemplaza archivo
         if 'foto_producto' in request.files:
             f = request.files['foto_producto']
             if f and f.filename:

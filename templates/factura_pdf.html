@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>Factura {{ factura.id_factura }}</title>
   <style>
-    /* Evita CSS modernos — usa reglas simples */
+    /* Estilos simples compatibles con xhtml2pdf */
     @page { size: A4; margin: 20mm; }
     body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #222; margin:0; padding:0; }
     .container { padding: 0 4mm; }
@@ -19,7 +19,6 @@
     tfoot td { border:none; padding-top:10px; font-weight:bold; }
     .text-right { text-align:right; }
     .note { margin-top:14px; font-size:11px; color:#444; }
-    /* limpiar floats */
     .clearfix::after { content: ""; clear: both; display: table; }
   </style>
 </head>
@@ -30,14 +29,14 @@
         {% if logo_datauri %}
           <img src="{{ logo_datauri }}" alt="Logo" style="max-width:140px; height:auto;">
         {% else %}
-          <h1>TuEmpresa</h1>
+          <h1>Fashion Fusion</h1>
         {% endif %}
         <div class="small">Dirección · Teléfono · NIT</div>
       </div>
       <div class="right">
         <div>Factura: <strong>{{ factura.id_factura }}</strong></div>
         <div>Fecha: {{ factura.creado_en_str }}</div>
-        <div>Cliente: {{ factura.usuario_nombre }}</div>
+        <div>Cliente: {{ factura.usuario.nombre if factura.usuario else factura.usuario }}</div>
       </div>
     </header>
 
@@ -77,10 +76,11 @@
       <strong>Dirección de envío:</strong><br>
       {{ factura.direccion_envio }}
     </div>
+
     <footer>
-        <p>Gracias por comprar en <strong>Fashion Fusion</strong> 🖤</p>
-        <p>Moda urbana con estilo y actitud.</p>
-      </footer>
+      <p>Gracias por comprar en <strong>Fashion Fusion</strong> 🖤</p>
+      <p>Moda urbana con estilo y actitud.</p>
+    </footer>
   </div>
 </body>
 </html>

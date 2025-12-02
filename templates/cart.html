@@ -23,7 +23,8 @@
           {% for item in carrito %}
           <tr>
             <td class="align-middle">
-              <img src="{{ url_for('static', filename='img/' ~ item.producto.foto_producto) }}" 
+              <!-- ✅ Usamos item.imagen directamente -->
+              <img src="{{ item.imagen }}" 
                    alt="{{ item.nombre }}" style="width: 60px; height: auto; margin-right: 10px;">
               {{ item.nombre }}
             </td>

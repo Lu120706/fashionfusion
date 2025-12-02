@@ -25,22 +25,13 @@
 
           <!-- Formulario para añadir al carrito -->
           <form action="{{ url_for('carrito.add_to_cart', product_id=p.id_producto) }}" method="POST">
-
-            <div class="d-flex justify-content-center gap-2 mb-2">
+            <div class="d-flex justify-content-center mb-2">
               <select name="talla" class="form-select form-select-sm" required>
                 <option value="">Talla</option>
                 <option value="S">S</option>
                 <option value="M">M</option>
                 <option value="L">L</option>
                 <option value="XL">XL</option>
-              </select>
-
-              <select name="color" class="form-select form-select-sm" required>
-                <option value="">Color</option>
-                <option value="Negro">Negro</option>
-                <option value="Blanco">Blanco</option>
-                <option value="Azul">Azul</option>
-                <option value="Rojo">Rojo</option>
               </select>
             </div>
             <button type="submit" class="btn btn-dark w-100">Añadir al carrito</button>

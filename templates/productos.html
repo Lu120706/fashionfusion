@@ -5,18 +5,31 @@
   <div class="row g-4">
     <!-- Imagen del producto -->
     <div class="col-md-6 col-12">
-      <img src="{{ product.image }}" alt="{{ product.name }}" class="img-fluid rounded shadow-sm w-100">
+      <img src="{{ url_for('static', filename='img/' ~ product.foto_producto) }}" 
+           alt="{{ product.nombre }}" 
+           class="img-fluid rounded shadow-sm w-100">
     </div>
 
     <!-- Detalles del producto -->
     <div class="col-md-6 col-12">
-      <h1 class="mb-3">{{ product.name }}</h1>
-      <p class="text-muted mb-4">{{ product.desc }}</p>
-      <h3 class="text-primary mb-4">${{ '%.2f'|format(product.price) }}</h3>
+      <h1 class="mb-3">{{ product.nombre }}</h1>
+      <p class="text-muted mb-4">{{ product.descripcion }}</p>
+      <h3 class="text-primary mb-4">${{ '%.2f'|format(product.precio_producto) }}</h3>
 
-      {% if session.get('username') %}
-        <form method="POST" action="{{ url_for('add_to_cart', pid=product.id) }}">
-          <!-- aquí tu formulario de carrito (tallas, color, cantidad...) -->
+      {% if current_user.is_authenticated %}
+        <!-- ✅ Formulario de carrito solo con talla -->
+        <form method="POST" action="{{ url_for('carrito.add_to_cart', product_id=product.id_producto) }}">
+          <div class="mb-3">
+            <label for="talla" class="form-label">Talla</label>
+            <select name="talla" id="talla" class="form-select" required>
+              <option value="">Selecciona talla</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-dark w-100">Añadir al carrito</button>
         </form>
       {% else %}
         <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg w-100">
@@ -27,8 +40,8 @@
       <!-- ======= Sección de reseñas ======= -->
       <hr class="my-4">
       <div id="productReviewSection" 
-           data-product-id="{{ product.id }}" 
-           data-current-user="{{ session.get('username') or '' }}">
+           data-product-id="{{ product.id_producto }}" 
+           data-current-user="{{ current_user.nombre if current_user.is_authenticated else '' }}">
         
         <div class="d-flex align-items-center justify-content-between mb-2">
           <h4 class="mb-0">Reseñas</h4>
@@ -36,12 +49,11 @@
             <div id="avgText">Cargando reseñas...</div>
           </div>
         </div>
-
-        {% if session.get('username') %}
+        {% if current_user.is_authenticated %}
         <div id="reviewFormWrapper">
           <h5 id="formTitle">Deja una reseña</h5>
           <form id="reviewForm" enctype="multipart/form-data" class="mb-3">
-            <input type="hidden" name="id_producto" id="id_producto" value="{{ product.id }}">
+            <input type="hidden" name="id_producto" id="id_producto" value="{{ product.id_producto }}">
             <input type="hidden" name="id_resena" id="id_resena" value="">
 
             <!-- Calidad -->
@@ -113,228 +125,210 @@
   .row { flex-direction: column; }
   .col-md-6 { width: 100%; }
 }
-
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const section = document.getElementById('productReviewSection');
-  if (!section) return;
-  const pid = section.dataset.productId;
-  const currentUser = (section.dataset.currentUser || '').trim();
-  const form = document.getElementById('reviewForm');
-  const reviewsList = document.getElementById('reviewsList');
-  const avgText = document.getElementById('avgText');
-  const idResenaInput = document.getElementById('id_resena');
-  const submitBtn = document.getElementById('submitBtn');
-  const cancelEditBtn = document.getElementById('cancelEditBtn');
+  document.addEventListener('DOMContentLoaded', () => {
+    const section = document.getElementById('productReviewSection');
+    if (!section) return;
+    const pid = section.dataset.productId;
+    const currentUser = (section.dataset.currentUser || '').trim();
+    const form = document.getElementById('reviewForm');
+    const reviewsList = document.getElementById('reviewsList');
+    const avgText = document.getElementById('avgText');
+    const idResenaInput = document.getElementById('id_resena');
+    const submitBtn = document.getElementById('submitBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
 
-  let reviewsCache = [];
+    let reviewsCache = [];
 
-  async function loadReviews(){
-    try {
-      const r = await fetch('/api/obtener_reseñas?id_producto=' + encodeURIComponent(pid));
-      if (!r.ok) throw new Error('No se pudieron cargar reseñas');
-      const data = await r.json();
-      reviewsCache = data.reseñas || [];
-      renderSummary(reviewsCache);
-      renderList(reviewsCache);
-      checkUserReview(reviewsCache);
-    } catch(e){ 
-      console.error(e);
-      avgText.textContent = 'No se pudieron cargar las reseñas';
-    }
-  }
-
-  function renderSummary(list){
-    if (!list.length) {
-      avgText.innerHTML = 'Sin reseñas aún';
-      return;
-    }
-    const sumQuality = list.reduce((s, x) => s + (Number(x.calidad)||0), 0);
-    const sumComfort = list.reduce((s, x) => s + (Number(x.comodidad)||0), 0);
-    const avgQuality = (sumQuality / list.length);
-    const avgComfort = (sumComfort / list.length);
-    // mostrar con 1 decimal
-    avgText.innerHTML = `
-      <div><strong>${list.length}</strong> reseña(s)</div>
-      <div>Calidad: ${avgQuality.toFixed(1)} · Comodidad: ${avgComfort.toFixed(1)}</div>
-    `;
-  }
-
-  function renderList(list){
-    reviewsList.innerHTML = '';
-    if (!list.length) {
-      reviewsList.innerHTML = '<p class="text-muted">Sé el primero en dejar una reseña.</p>';
-      return;
-    }
-    list.forEach(r => {
-      const div = document.createElement('div');
-      div.className = 'single-review card p-2 mb-2';
-      const userEsc = escapeHtml(r.id_usuario);
-      const commentEsc = escapeHtml(r.comentario_resena || '');
-      const foto = r.foto_url ? `<img src="${r.foto_url}" alt="foto" style="max-width:180px; display:block; margin-top:6px;">` : '';
-      // acciones solo si es el autor
-      const isOwner = currentUser && (currentUser === r.id_usuario);
-      div.innerHTML = `
-        <div class="d-flex justify-content-between">
-          <div><strong>${userEsc}</strong> <span class="meta">· ${r.creado_en}</span></div>
-          ${isOwner ? '<div class="text-end"><small class="text-muted">Tu reseña</small></div>' : ''}
-        </div>
-        <div class="mt-1">Calidad: ${stars(r.calidad)} · Comodidad: ${stars(r.comodidad)}</div>
-        <p class="mt-2 mb-0">${commentEsc}</p>
-        ${foto}
-        ${isOwner ? `<div class="actions"><button class="btn btn-sm btn-outline-primary me-2" data-action="edit" data-id="${r.id_resena}">Editar</button><button class="btn btn-sm btn-outline-danger" data-action="delete" data-id="${r.id_resena}">Eliminar</button></div>` : ''}
-      `;
-      reviewsList.appendChild(div);
-    });
-    // attach listeners for edit/delete
-    reviewsList.querySelectorAll('button[data-action]').forEach(btn => {
-      btn.addEventListener('click', handleActionClick);
-    });
-  }
-
-  function checkUserReview(list){
-    if (!currentUser) return; // no logueado: nada que hacer
-    const mine = list.find(r => r.id_usuario === currentUser);
-    if (mine){
-      // Ocultar formulario si ya existe reseña; mostrar pequeña nota con opciones (editar/eliminar ya en la lista)
-      const wrapper = document.getElementById('reviewFormWrapper');
-      if (wrapper) {
-        wrapper.querySelectorAll('input,textarea,button').forEach(el => {
-          // no removemos el formulario, solo lo ocultamos para prevenir envíos duplicados
-          el.disabled = true;
-        });
-        wrapper.style.opacity = '0.7';
-        const note = document.createElement('div');
-        note.className = 'alert alert-info mt-2';
-        note.id = 'alreadyNote';
-        note.innerHTML = `Ya dejaste una reseña para este producto. Usa <strong>Editar</strong> si quieres modificarla.`;
-        wrapper.appendChild(note);
-      }
-    } else {
-      // si no existe reseña propia, aseguramos que el formulario esté activo
-      const wrapper = document.getElementById('reviewFormWrapper');
-      if (wrapper) {
-        wrapper.querySelectorAll('input,textarea,button').forEach(el => el.disabled = false);
-        wrapper.style.opacity = '1';
-        const note = document.getElementById('alreadyNote');
-        if (note) note.remove();
+    async function loadReviews(){
+      try {
+        const r = await fetch('/api/obtener_reseñas?id_producto=' + encodeURIComponent(pid));
+        if (!r.ok) throw new Error('No se pudieron cargar reseñas');
+        const data = await r.json();
+        reviewsCache = data.reseñas || [];
+        renderSummary(reviewsCache);
+        renderList(reviewsCache);
+        checkUserReview(reviewsCache);
+      } catch(e){ 
+        console.error(e);
+        avgText.textContent = 'No se pudieron cargar las reseñas';
       }
     }
-  }
 
-  function handleActionClick(e){
-    const action = e.currentTarget.dataset.action;
-    const id = e.currentTarget.dataset.id;
-    if (action === 'edit') {
-      startEdit(id);
-    } else if (action === 'delete') {
-      confirmDelete(id);
-    }
-  }
-
-  function startEdit(id){
-    const r = reviewsCache.find(x => String(x.id_resena) === String(id));
-    if (!r) return alert('Reseña no encontrada');
-    // habilitar formulario y rellenar
-    idResenaInput.value = r.id_resena;
-    document.getElementById('comentario_resena').value = r.comentario_resena || '';
-    // poner estrellas calidad/comodidad
-    const calidadRadio = document.querySelector(`input[name="calidad"][value="${r.calidad}"]`);
-    const comodidadRadio = document.querySelector(`input[name="comodidad"][value="${r.comodidad}"]`);
-    if (calidadRadio) calidadRadio.checked = true;
-    if (comodidadRadio) comodidadRadio.checked = true;
-
-    // cambiar UI a modo edición
-    document.getElementById('formTitle').textContent = 'Editar reseña';
-    submitBtn.textContent = 'Guardar cambios';
-    cancelEditBtn.classList.remove('d-none');
-    // habilitar inputs (por si estaban deshabilitados)
-    document.querySelectorAll('#reviewForm input, #reviewForm textarea, #reviewForm button').forEach(el => el.disabled = false);
-    // scroll to form
-    document.getElementById('reviewForm').scrollIntoView({behavior:'smooth', block:'center'});
-  }
-
-  cancelEditBtn && cancelEditBtn.addEventListener('click', () => {
-    // limpiar modo edición
-    idResenaInput.value = '';
-    document.getElementById('comentario_resena').value = '';
-    document.querySelectorAll('input[name="calidad"], input[name="comodidad"]').forEach(i => i.checked = false);
-    document.getElementById('formTitle').textContent = 'Deja una reseña';
-    submitBtn.textContent = 'Enviar reseña';
-    cancelEditBtn.classList.add('d-none');
-  });
-
-  async function confirmDelete(id){
-    if (!confirm('¿Estás seguro de eliminar tu reseña? Esta acción no se puede deshacer.')) return;
-    try {
-      const resp = await fetch('/api/eliminar_reseña', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({id_resena: id})
-      });
-      const json = await resp.json();
-      if (resp.ok && json.success) {
-        alert('Reseña eliminada.');
-        await loadReviews();
-      } else {
-        alert('Error al eliminar: ' + (json.message || ''));
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Error en la petición de eliminación.');
-    }
-  }
-
-  if (form){
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const fd = new FormData(form);
-
-      // validación mínima
-      if (!fd.get('calidad') || !fd.get('comodidad')) {
-        alert('Por favor califica calidad y comodidad.');
+    function renderSummary(list){
+      if (!list.length) {
+        avgText.innerHTML = 'Sin reseñas aún';
         return;
       }
+      const sumQuality = list.reduce((s, x) => s + (Number(x.calidad)||0), 0);
+      const sumComfort = list.reduce((s, x) => s + (Number(x.comodidad)||0), 0);
+      const avgQuality = (sumQuality / list.length);
+      const avgComfort = (sumComfort / list.length);
+      avgText.innerHTML = `
+        <div><strong>${list.length}</strong> reseña(s)</div>
+        <div>Calidad: ${avgQuality.toFixed(1)} · Comodidad: ${avgComfort.toFixed(1)}</div>
+      `;
+    }
 
-      // si id_resena está presente -> editar ruta distinta, sino crear
-      const id_resena = fd.get('id_resena');
-      const url = id_resena ? '/api/editar_reseña' : '/api/guardar_reseña';
+    function renderList(list){
+      reviewsList.innerHTML = '';
+      if (!list.length) {
+        reviewsList.innerHTML = '<p class="text-muted">Sé el primero en dejar una reseña.</p>';
+        return;
+      }
+      list.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'single-review card p-2 mb-2';
+        const userEsc = escapeHtml(r.id_usuario);
+        const commentEsc = escapeHtml(r.comentario_resena || '');
+        const foto = r.foto_url ? `<img src="${r.foto_url}" alt="foto" style="max-width:180px; display:block; margin-top:6px;">` : '';
+        const isOwner = currentUser && (currentUser === r.id_usuario);
+        div.innerHTML = `
+          <div class="d-flex justify-content-between">
+            <div><strong>${userEsc}</strong> <span class="meta">· ${r.creado_en}</span></div>
+            ${isOwner ? '<div class="text-end"><small class="text-muted">Tu reseña</small></div>' : ''}
+          </div>
+          <div class="mt-1">Calidad: ${stars(r.calidad)} · Comodidad: ${stars(r.comodidad)}</div>
+          <p class="mt-2 mb-0">${commentEsc}</p>
+          ${foto}
+          ${isOwner ? `<div class="actions"><button class="btn btn-sm btn-outline-primary me-2" data-action="edit" data-id="${r.id_resena}">Editar</button><button class="btn btn-sm btn-outline-danger" data-action="delete" data-id="${r.id_resena}">Eliminar</button></div>` : ''}
+        `;
+        reviewsList.appendChild(div);
+      });
+      reviewsList.querySelectorAll('button[data-action]').forEach(btn => {
+        btn.addEventListener('click', handleActionClick);
+      });
+    }
+
+    function checkUserReview(list){
+      if (!currentUser) return;
+      const mine = list.find(r => r.id_usuario === currentUser);
+      if (mine){
+        const wrapper = document.getElementById('reviewFormWrapper');
+        if (wrapper) {
+          wrapper.querySelectorAll('input,textarea,button').forEach(el => el.disabled = true);
+          wrapper.style.opacity = '0.7';
+          const note = document.createElement('div');
+          note.className = 'alert alert-info mt-2';
+          note.id = 'alreadyNote';
+          note.innerHTML =
+                    note.innerHTML = `Ya dejaste una reseña para este producto. Usa <strong>Editar</strong> si quieres modificarla.`;
+          wrapper.appendChild(note);
+        }
+      } else {
+        const wrapper = document.getElementById('reviewFormWrapper');
+        if (wrapper) {
+          wrapper.querySelectorAll('input,textarea,button').forEach(el => el.disabled = false);
+          wrapper.style.opacity = '1';
+          const note = document.getElementById('alreadyNote');
+          if (note) note.remove();
+        }
+      }
+    }
+
+    function handleActionClick(e){
+      const action = e.currentTarget.dataset.action;
+      const id = e.currentTarget.dataset.id;
+      if (action === 'edit') {
+        startEdit(id);
+      } else if (action === 'delete') {
+        confirmDelete(id);
+      }
+    }
+
+    function startEdit(id){
+      const r = reviewsCache.find(x => String(x.id_resena) === String(id));
+      if (!r) return alert('Reseña no encontrada');
+      idResenaInput.value = r.id_resena;
+      document.getElementById('comentario_resena').value = r.comentario_resena || '';
+      const calidadRadio = document.querySelector(`input[name="calidad"][value="${r.calidad}"]`);
+      const comodidadRadio = document.querySelector(`input[name="comodidad"][value="${r.comodidad}"]`);
+      if (calidadRadio) calidadRadio.checked = true;
+      if (comodidadRadio) comodidadRadio.checked = true;
+
+      document.getElementById('formTitle').textContent = 'Editar reseña';
+      submitBtn.textContent = 'Guardar cambios';
+      cancelEditBtn.classList.remove('d-none');
+      document.querySelectorAll('#reviewForm input, #reviewForm textarea, #reviewForm button').forEach(el => el.disabled = false);
+      document.getElementById('reviewForm').scrollIntoView({behavior:'smooth', block:'center'});
+    }
+
+    cancelEditBtn && cancelEditBtn.addEventListener('click', () => {
+      idResenaInput.value = '';
+      document.getElementById('comentario_resena').value = '';
+      document.querySelectorAll('input[name="calidad"], input[name="comodidad"]').forEach(i => i.checked = false);
+      document.getElementById('formTitle').textContent = 'Deja una reseña';
+      submitBtn.textContent = 'Enviar reseña';
+      cancelEditBtn.classList.add('d-none');
+    });
+
+    async function confirmDelete(id){
+      if (!confirm('¿Estás seguro de eliminar tu reseña? Esta acción no se puede deshacer.')) return;
       try {
-        const resp = await fetch(url, { method: 'POST', body: fd });
+        const resp = await fetch('/api/eliminar_reseña', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({id_resena: id})
+        });
         const json = await resp.json();
-        if (resp.ok && json.success){
-          // recargar reseñas y limpiar formulario (o salir de modo edición)
+        if (resp.ok && json.success) {
+          alert('Reseña eliminada.');
           await loadReviews();
-          if (id_resena) {
-            // salir modo edición
-            cancelEditBtn.click();
-          } else {
-            form.reset();
-          }
-          alert(json.message || 'Operación exitosa.');
         } else {
-          alert('Error: ' + (json.message || 'No se pudo completar.'));
+          alert('Error al eliminar: ' + (json.message || ''));
         }
       } catch (err) {
         console.error(err);
-        alert('Error en la petición.');
+        alert('Error en la petición de eliminación.');
       }
-    });
-  }
+    }
 
-  function stars(n){
-    n = Number(n) || 0;
-    return '★'.repeat(n) + '☆'.repeat(5-n);
-  }
-  function escapeHtml(t){
-    if (!t) return '';
-    return t.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
+    if (form){
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(form);
 
-  loadReviews();
-});
+        if (!fd.get('calidad') || !fd.get('comodidad')) {
+          alert('Por favor califica calidad y comodidad.');
+          return;
+        }
+
+        const id_resena = fd.get('id_resena');
+        const url = id_resena ? '/api/editar_reseña' : '/api/guardar_reseña';
+        try {
+          const resp = await fetch(url, { method: 'POST', body: fd });
+          const json = await resp.json();
+          if (resp.ok && json.success){
+            await loadReviews();
+            if (id_resena) {
+              cancelEditBtn.click();
+            } else {
+              form.reset();
+            }
+            alert(json.message || 'Operación exitosa.');
+          } else {
+            alert('Error: ' + (json.message || 'No se pudo completar.'));
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Error en la petición.');
+        }
+      });
+    }
+
+    function stars(n){
+      n = Number(n) || 0;
+      return '★'.repeat(n) + '☆'.repeat(5-n);
+    }
+    function escapeHtml(t){
+      if (!t) return '';
+      return t.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    loadReviews();
+  });
 </script>
 
 {% endblock %}

@@ -1,4 +1,3 @@
-import base64
 from decimal import Decimal
 from flask import Blueprint, request, session, flash, redirect, url_for, render_template
 from flask_login import login_required, current_user
@@ -79,19 +78,10 @@ def cart():
     total = Decimal('0.00')
 
     for key, item in cart_dict.items():
-
-        # Obtener imagen REAL desde la base de datos (ya NO desde sesión)
         producto = Producto.query.get(item.get('id'))
-        imagen_src = "/static/no-image.png"
 
-        try:
-            if producto and producto.foto_producto:
-                imagen_src = (
-                    "data:image/jpeg;base64,"
-                    + base64.b64encode(producto.foto_producto).decode()
-                )
-        except:
-            pass
+        # ✅ Usar ruta estática para la imagen
+        imagen_src = url_for('static', filename='img/' + producto.foto_producto) if producto and producto.foto_producto else url_for('static', filename='no-image.png')
 
         precio = Decimal(str(item.get('precio', 0)))
         cantidad = int(item.get('cantidad', 1))
