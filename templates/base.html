@@ -93,10 +93,8 @@
                     {% endif %}
 
                     <li class="nav-item"><span class="nav-link">Hola, {{ username }}</span></li>
-                    <!-- ✅ Ajustado a blueprint de registro -->
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('registro.logout') }}">Cerrar sesión</a></li>
                 {% else %}
-                    <!-- ✅ Ajustado a blueprint de registro -->
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('registro.login') }}">Iniciar sesión</a></li>
                 {% endif %}
             </ul>
@@ -105,11 +103,14 @@
 
     <main class="container my-5">
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
         {% endwith %}
 
         {% block content %}{% endblock %}
