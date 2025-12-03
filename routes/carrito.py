@@ -9,11 +9,9 @@ carrito_bp = Blueprint('carrito', __name__)
 # Helpers
 # -----------------------
 def _get_cart():
-    """Obtiene el carrito actual desde la sesión."""
     return session.get("cart", {})
 
 def format_currency(value, symbol='$'):
-    """Formatea valores numéricos como moneda."""
     try:
         v = Decimal(value)
     except Exception:
@@ -28,26 +26,22 @@ def format_currency(value, symbol='$'):
 @carrito_bp.route('/cart/add/<int:product_id>', methods=['POST'])
 @login_required
 def add_to_cart(product_id):
-    """Agrega un producto al carrito."""
     producto = Producto.query.get_or_404(product_id)
     talla = request.form.get('talla') or request.form.get('size')
-    color = request.form.get('color')
 
-    if not talla or not color:
-        flash('Por favor selecciona talla y color antes de añadir al carrito.', 'warning')
+    if not talla:
+        flash('Por favor selecciona una talla antes de añadir al carrito.', 'warning')
         return redirect(url_for('productos.catalogo'))
 
     cart = _get_cart()
-    key = f"{product_id}:{talla}:{color}"
+    key = f"{product_id}:{talla}"
 
-    # Obtener precio
     precio_attr = getattr(producto, 'precio_producto', None) or getattr(producto, 'precio', 0)
     try:
         precio_float = float(precio_attr)
     except Exception:
         precio_float = 0.0
 
-    # Si ya existe el producto en el carrito
     if key in cart:
         cart[key]['cantidad'] = int(cart[key].get('cantidad', 0)) + 1
     else:
@@ -56,31 +50,25 @@ def add_to_cart(product_id):
             'nombre': producto.nombre,
             'precio': precio_float,
             'cantidad': 1,
-            'talla': talla,
-            'color': color
-            # ❗ Imagen ya NO se guarda en la sesión ❗
+            'talla': talla
         }
 
     session['cart'] = cart
     session.modified = True
 
-    flash(f"{producto.nombre} agregado al carrito (Talla {talla}, Color {color})", 'success')
-    
+    flash(f"{producto.nombre} agregado al carrito (Talla {talla})", 'success')
     return redirect(url_for('carrito.cart'))
 
 
 @carrito_bp.route('/cart')
 @login_required
 def cart():
-    """Muestra los productos del carrito."""
     cart_dict = _get_cart()
     carrito = []
     total = Decimal('0.00')
 
     for key, item in cart_dict.items():
         producto = Producto.query.get(item.get('id'))
-
-        # ✅ Usar ruta estática para la imagen
         imagen_src = url_for('static', filename='img/' + producto.foto_producto) if producto and producto.foto_producto else url_for('static', filename='no-image.png')
 
         precio = Decimal(str(item.get('precio', 0)))
@@ -95,7 +83,6 @@ def cart():
             'precio': float(precio),
             'cantidad': cantidad,
             'talla': item.get('talla'),
-            'color': item.get('color'),
             'imagen': imagen_src,
             'subtotal': float(subtotal)
         })
@@ -106,7 +93,6 @@ def cart():
 @carrito_bp.route('/cart/update', methods=['POST'])
 @login_required
 def update_cart():
-    """Actualiza la cantidad de un producto."""
     key = request.form.get('key')
     action = request.form.get('action')
     cart = _get_cart()
@@ -128,10 +114,9 @@ def update_cart():
 @carrito_bp.route('/cart/remove', methods=['POST'])
 @login_required
 def remove_from_cart():
-    """Elimina un producto específico del carrito."""
     key = request.form.get('key')
-
     cart = _get_cart()
+
     if key in cart:
         del cart[key]
         session['cart'] = cart
@@ -146,7 +131,6 @@ def remove_from_cart():
 @carrito_bp.route('/cart/clear')
 @login_required
 def clear_cart():
-    """Vacía completamente el carrito."""
     session.pop("cart", None)
     session.modified = True
     flash("Carrito limpiado.", "info")
@@ -156,22 +140,17 @@ def clear_cart():
 @carrito_bp.route('/cart/checkout', methods=['POST'])
 @login_required
 def cart_checkout():
-    """Procesa la compra, guarda la factura en la base de datos y redirige a la vista de factura."""
-    from models import Factura, FacturaItem, Pedido, db  # ✅ Importamos Pedido también
+    from models import Factura, FacturaItem, Pedido, db
 
     cart = session.get('cart', {})
     if not cart:
         flash('Tu carrito está vacío.', 'warning')
         return redirect(url_for('carrito.cart'))
 
-    # Obtener datos del usuario actual
     usuario_id = getattr(current_user, 'id_usuario', None) or current_user.get_id()
     direccion_envio = request.form.get('direccion_envio', '').strip()
-
-    # Calcular total de la factura
     total = sum(float(item['precio']) * int(item['cantidad']) for item in cart.values())
 
-    # Crear la factura principal
     factura = Factura(
         id_usuario=str(usuario_id),
         direccion_envio=direccion_envio,
@@ -179,9 +158,8 @@ def cart_checkout():
         estado='pagada'
     )
     db.session.add(factura)
-    db.session.commit()  # Guarda para obtener el ID
+    db.session.commit()
 
-    # Crear los items de la factura y pedidos
     for item in cart.values():
         subtotal = float(item['precio']) * int(item['cantidad'])
         factura_item = FacturaItem(
@@ -189,14 +167,12 @@ def cart_checkout():
             id_producto=item['id'],
             nombre_producto=item['nombre'],
             talla=item.get('talla', ''),
-            color=item.get('color', ''),
             cantidad=item['cantidad'],
             precio_unitario=item['precio'],
             subtotal=subtotal
         )
         db.session.add(factura_item)
 
-        # ✅ Guardar también en la tabla Pedido (sin color)
         pedido = Pedido(
             producto=item['nombre'],
             talla=item.get('talla', ''),
@@ -207,7 +183,6 @@ def cart_checkout():
 
     db.session.commit()
 
-    # Limpiar carrito
     session.pop('cart', None)
     session.modified = True
 

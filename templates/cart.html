@@ -12,7 +12,6 @@
           <tr class="text-center">
             <th>Producto</th>
             <th>Talla</th>
-            <th>Color</th>
             <th>Precio</th>
             <th>Cantidad</th>
             <th>Subtotal</th>
@@ -23,13 +22,12 @@
           {% for item in carrito %}
           <tr>
             <td class="align-middle">
-              <!-- ✅ Usamos item.imagen directamente -->
+              <!-- Imagen del producto -->
               <img src="{{ item.imagen }}" 
                    alt="{{ item.nombre }}" style="width: 60px; height: auto; margin-right: 10px;">
               {{ item.nombre }}
             </td>
             <td class="text-center align-middle">{{ item.talla }}</td>
-            <td class="text-center align-middle">{{ item.color }}</td>
             <td class="text-center align-middle">${{ "%.2f"|format(item.precio) }}</td>
 
             <td class="text-center align-middle">

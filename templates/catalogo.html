@@ -10,11 +10,19 @@
       <div class="card h-100 shadow-sm product-card">
 
         <!-- Imagen clickeable para agrandar -->
-        <img src="{{ url_for('static', filename='img/' ~ p.foto_producto) }}"
+        <img src="{% if p.foto_producto %}
+                    {{ url_for('static', filename='img/' ~ p.foto_producto) }}
+                  {% else %}
+                    {{ url_for('static', filename='no-image.png') }}
+                  {% endif %}"
              class="card-img-top img-click"
              alt="{{ p.nombre }}"
              style="height:250px;object-fit:cover; cursor:pointer;"
-             data-img="{{ url_for('static', filename='img/' ~ p.foto_producto) }}">
+             data-img="{% if p.foto_producto %}
+                         {{ url_for('static', filename='img/' ~ p.foto_producto) }}
+                       {% else %}
+                         {{ url_for('static', filename='no-image.png') }}
+                       {% endif %}">
 
         <div class="card-body d-flex flex-column">
           <h5 class="card-title text-center">{{ p.nombre }}</h5>
