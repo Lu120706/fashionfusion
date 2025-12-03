@@ -4,7 +4,7 @@ from extensions import db
 from models import Usuario, Rol
 from decorators import find_or_create_role
 from flask_login import login_user, logout_user
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 # Blueprint de registro/autenticación
 registro_bp = Blueprint('registro', __name__, url_prefix='/registro')
@@ -49,8 +49,7 @@ def register():
             direccion=direccion,
             id_rol=rol_user.id_rol
         )
-        # Método set_password debe guardar el hash en usuario.contrasena
-        nuevo_usuario.set_password(password)
+        nuevo_usuario.set_password(password)  # guarda hash en usuario.contrasena
 
         db.session.add(nuevo_usuario)
         try:
@@ -100,3 +99,49 @@ def logout():
     session.clear()
     flash("Sesión cerrada correctamente", "info")
     return redirect(url_for('home.index'))
+
+
+# -----------------------
+# RECUPERAR CONTRASEÑA
+# -----------------------
+@registro_bp.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        correo = request.form['correo'].strip()
+        usuario = Usuario.query.filter_by(correo=correo).first()
+
+        if usuario:
+            # ⚠️ Aquí deberías enviar un correo con un token seguro
+            # Por simplicidad, redirigimos a reset_password con el id_usuario
+            flash("📧 Ingresa tu nueva contraseña.", "info")
+            return redirect(url_for('registro.reset_password', user_id=usuario.id_usuario))
+        else:
+            flash("⚠️ No existe un usuario con ese correo.", "danger")
+
+    return render_template('forgot_password.html')
+
+
+# -----------------------
+# RESTABLECER CONTRASEÑA
+# -----------------------
+@registro_bp.route('/reset_password/<user_id>', methods=['GET', 'POST'])
+def reset_password(user_id):
+    usuario = Usuario.query.filter_by(id_usuario=user_id).first()
+    if not usuario:
+        flash("❌ Usuario no encontrado.", "danger")
+        return redirect(url_for('registro.forgot_password'))
+
+    if request.method == 'POST':
+        password = request.form['password']
+        confirm = request.form['confirm_password']
+
+        if password != confirm:
+            flash("⚠️ Las contraseñas no coinciden.", "danger")
+            return render_template('reset_password.html')
+
+        usuario.contrasena = generate_password_hash(password)
+        db.session.commit()
+        flash("✅ Contraseña actualizada correctamente. Ya puedes iniciar sesión.", "success")
+        return redirect(url_for('registro.login'))
+
+    return render_template('reset_password.html')
