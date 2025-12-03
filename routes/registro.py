@@ -2,7 +2,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from extensions import db
 from models import Usuario, Rol
-from decorators import find_or_create_role
 from flask_login import login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -35,10 +34,10 @@ def register():
             flash('⚠️ El correo ya está registrado', 'danger')
             return render_template('register.html')
 
-        # Crear o buscar rol 'user'
-        rol_user = find_or_create_role(db, Rol, 'user')
+        # Buscar rol 'usuario' (no crear uno nuevo)
+        rol_user = Rol.query.filter(Rol.nombre.ilike('usuario')).first()
         if not rol_user:
-            flash('❌ Error creando rol de usuario', 'danger')
+            flash('❌ El rol "usuario" no existe. Crea el rol primero en el panel de administración.', 'danger')
             return render_template('register.html')
 
         # Crear usuario
@@ -49,7 +48,7 @@ def register():
             direccion=direccion,
             id_rol=rol_user.id_rol
         )
-        nuevo_usuario.set_password(password)  # guarda hash en usuario.contrasena
+        nuevo_usuario.set_password(password)
 
         db.session.add(nuevo_usuario)
         try:
@@ -77,11 +76,8 @@ def login():
 
         if usuario and check_password_hash(usuario.contrasena, contrasena):
             login_user(usuario)
-
-            # Guardar datos en sesión
             session["role"] = usuario.id_rol
             session["user_id"] = usuario.id_usuario
-
             flash("Inicio de sesión exitoso", "success")
             return redirect(url_for('home.index'))
         else:
@@ -111,8 +107,6 @@ def forgot_password():
         usuario = Usuario.query.filter_by(correo=correo).first()
 
         if usuario:
-            # ⚠️ Aquí deberías enviar un correo con un token seguro
-            # Por simplicidad, redirigimos a reset_password con el id_usuario
             flash("📧 Ingresa tu nueva contraseña.", "info")
             return redirect(url_for('registro.reset_password', user_id=usuario.id_usuario))
         else:
