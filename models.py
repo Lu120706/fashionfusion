@@ -19,7 +19,7 @@ class Usuario(db.Model, UserMixin):
     id_rol = db.Column(db.Integer, db.ForeignKey('rol.id_rol'))
     creado_en = db.Column(db.DateTime, server_default=db.func.now())
     actualizado_en = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
-    codigo_verificacion = db.Column(db.String(4), nullable=True)
+    
 
     def set_password(self, raw):
         self.contrasena = generate_password_hash(raw)

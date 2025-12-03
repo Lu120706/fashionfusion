@@ -7,21 +7,22 @@
             <div class="card-body">
                 <h2 class="card-title text-center mb-4">Crear Cuenta</h2>
                 <form method="POST" action="{{ url_for('registro.register') }}">
-                    <!-- Usuario -->
+                    
+                    <!-- Número de documento -->
                     <div class="mb-3">
-                        <label for="id_usuario" class="form-label">Numero de documento</label>
+                        <label for="id_usuario" class="form-label">Número de documento</label>
                         <input type="text" class="form-control" id="id_usuario" name="id_usuario" required>
                     </div>
 
-                    <!-- Nombre -->
+                    <!-- Nombre completo -->
                     <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre Completo</label>
+                        <label for="nombre" class="form-label">Nombre completo</label>
                         <input type="text" class="form-control" id="nombre" name="nombre" required>
                     </div>
 
-                    <!-- Correo -->
+                    <!-- Correo electrónico -->
                     <div class="mb-3">
-                        <label for="correo" class="form-label">Correo Electrónico</label>
+                        <label for="correo" class="form-label">Correo electrónico</label>
                         <input type="email" class="form-control" id="correo" name="correo" required>
                     </div>
 
@@ -37,18 +38,19 @@
                         <input type="password" class="form-control" id="password" name="password" required>
                     </div>
 
-                    <!-- Confirmar Contraseña -->
+                    <!-- Confirmar contraseña -->
                     <div class="mb-3">
-                        <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
+                        <label for="confirm_password" class="form-label">Confirmar contraseña</label>
                         <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
                     </div>
 
-                    <!-- Botón -->
+                    <!-- Botón de registro -->
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary">Registrarse</button>
                     </div>
                 </form>
 
+                <!-- Enlace a login -->
                 <p class="text-center mt-3">
                     ¿Ya tienes cuenta? <a href="{{ url_for('registro.login') }}">Inicia sesión aquí</a>
                 </p>

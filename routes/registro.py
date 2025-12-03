@@ -1,11 +1,9 @@
 # routes/registro.py
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from extensions import db, mail
+from extensions import db
 from models import Usuario, Rol
 from flask_login import login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_mail import Message
-import random
 
 # Blueprint de registro/autenticación
 registro_bp = Blueprint('registro', __name__, url_prefix='/registro')
@@ -23,7 +21,6 @@ def register():
         confirm = request.form['confirm_password']
         direccion = request.form.get('direccion', '').strip()
 
-        # Validaciones básicas
         if password != confirm:
             flash('⚠️ Las contraseñas no coinciden', 'danger')
             return render_template('register.html')
@@ -36,13 +33,11 @@ def register():
             flash('⚠️ El correo ya está registrado', 'danger')
             return render_template('register.html')
 
-        # Buscar rol 'usuario'
         rol_user = Rol.query.filter(Rol.nombre.ilike('usuario')).first()
         if not rol_user:
             flash('❌ El rol "usuario" no existe. Crea el rol primero en el panel de administración.', 'danger')
             return render_template('register.html')
 
-        # Crear usuario
         nuevo_usuario = Usuario(
             id_usuario=id_usuario,
             nombre=nombre,
@@ -100,7 +95,7 @@ def logout():
 
 
 # -----------------------
-# RECUPERAR CONTRASEÑA (envía código)
+# RECUPERAR CONTRASEÑA (flujo directo)
 # -----------------------
 @registro_bp.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
@@ -109,45 +104,12 @@ def forgot_password():
         usuario = Usuario.query.filter_by(correo=correo).first()
 
         if usuario:
-            codigo = str(random.randint(1000, 9999))
-            usuario.codigo_verificacion = codigo
-            db.session.commit()
-
-            # Enviar correo real con Flask-Mail
-            msg = Message("Recuperación de contraseña - Fashion Fusion",
-                          recipients=[correo])
-            msg.body = f"Tu código de verificación es: {codigo}. Ingresa este número en la página para continuar con el restablecimiento de tu contraseña."
-            mail.send(msg)
-
-            flash("📧 Te enviamos un código de verificación a tu correo.", "info")
-            return redirect(url_for('registro.verificar_codigo', user_id=usuario.id_usuario))
+            flash("📧 Ingresa tu nueva contraseña.", "info")
+            return redirect(url_for('registro.reset_password', user_id=usuario.id_usuario))
         else:
             flash("⚠️ No existe un usuario con ese correo.", "danger")
 
     return render_template('forgot_password.html')
-
-
-# -----------------------
-# VERIFICAR CÓDIGO
-# -----------------------
-@registro_bp.route('/verificar_codigo/<user_id>', methods=['GET', 'POST'])
-def verificar_codigo(user_id):
-    usuario = Usuario.query.filter_by(id_usuario=user_id).first()
-    if not usuario:
-        flash("❌ Usuario no encontrado.", "danger")
-        return redirect(url_for('registro.forgot_password'))
-
-    if request.method == 'POST':
-        codigo_ingresado = request.form['codigo'].strip()
-        if usuario.codigo_verificacion == codigo_ingresado:
-            usuario.codigo_verificacion = None  # limpiar el código
-            db.session.commit()
-            flash("✅ Código verificado. Ingresa tu nueva contraseña.", "success")
-            return redirect(url_for('registro.reset_password', user_id=usuario.id_usuario))
-        else:
-            flash("⚠️ Código incorrecto. Verifica el número enviado a tu correo.", "danger")
-
-    return render_template('verificar_codigo.html')
 
 
 # -----------------------
