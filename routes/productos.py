@@ -43,7 +43,7 @@ def admin_create_product():
         except ValueError:
             stock = 0
 
-        # FOTO — si el admin sube archivo, lo guardas COMO ARCHIVO
+        # FOTO — si el admin sube archivo, lo guardas en static/img
         foto_filename = None
         if 'foto_producto' in request.files:
             f = request.files['foto_producto']
@@ -51,10 +51,10 @@ def admin_create_product():
                 filename = secure_filename(f.filename)
                 ts = datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")
                 filename = f"{ts}_{filename}"
-                upload_path = os.path.join(current_app.static_folder, 'uploads', 'productos')
+                upload_path = os.path.join(current_app.static_folder, 'img')
                 os.makedirs(upload_path, exist_ok=True)
                 f.save(os.path.join(upload_path, filename))
-                foto_filename = os.path.join('uploads', 'productos', filename)
+                foto_filename = filename  # solo guardamos el nombre
 
         nuevo = Producto(
             nombre=nombre,
@@ -113,7 +113,7 @@ def admin_edit_product(id_producto):
                 upload_path = os.path.join(current_app.static_folder, 'img')
                 os.makedirs(upload_path, exist_ok=True)
                 f.save(os.path.join(upload_path, filename))
-                foto_filename = filename
+                producto.foto_producto = filename  
 
         try:
             db.session.commit()
@@ -125,7 +125,6 @@ def admin_edit_product(id_producto):
         return redirect(url_for('productos.admin_products'))
 
     return render_template('product_form.html', action='Editar', producto=producto)
-
 
 @productos_bp.route('/admin/productos/delete/<int:id_producto>', methods=['POST'])
 @role_required(1)

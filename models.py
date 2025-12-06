@@ -41,7 +41,7 @@ class Producto(db.Model):
     precio_producto = db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
     disponibilidad = db.Column(db.Enum('SI', 'NO', name='disponibilidad_enum'), nullable=False, default='SI')
     stock = db.Column(db.Integer, nullable=False, default=0)
-    foto_producto = db.Column(db.String(255), nullable=True)  # ej: "camiseta1.jpg"
+    foto_producto = db.Column(db.String(255), nullable=True) 
     creado_en = db.Column(db.DateTime, default=datetime.utcnow)
 
 
