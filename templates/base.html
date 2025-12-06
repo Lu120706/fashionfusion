@@ -84,10 +84,7 @@
                   {% endif %}
                 </a>
               </li>
-      
-              {% if current_user.is_authenticated %}
-                {% set username = current_user.nombre if current_user.nombre is defined else current_user.get_id() %}
-                {% if session.get('role') == 1 %}
+              
                   <!-- Menú desplegable para administración -->
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
