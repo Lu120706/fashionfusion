@@ -86,6 +86,7 @@
               </li>
       
               {% if current_user.is_authenticated %}
+                {% set username = current_user.nombre if current_user.nombre is defined else current_user.get_id() %}
                 {% if session.get('role') == 1 %}
                   <!-- Menú desplegable para administración -->
                   <li class="nav-item dropdown">
@@ -101,7 +102,6 @@
                   </li>
                 {% endif %}
       
-                <li class="nav-item"><span class="nav-link">Hola, {{ username }}</span></li>
                 <li class="nav-item"><a class="nav-link" href="{{ url_for('registro.logout') }}">Cerrar sesión</a></li>
               {% else %}
                 <li class="nav-item"><a class="nav-link" href="{{ url_for('registro.login') }}">Iniciar sesión</a></li>
