@@ -164,14 +164,20 @@ def imagen(pid):
     with open(default_path, "rb") as f:
         return Response(f.read(), mimetype="image/png")
     
-@productos_bp.route('/debug/productos')
-@role_required(1)
-def debug_productos():
+@productos_bp.route('/debug/imagenes')
+def debug_imagenes():
     productos = Producto.query.all()
-    html = "<h2>Debug: Productos y rutas de imagen</h2><ul>"
+    html = "<h2>Listado de productos con imágenes</h2>"
     for p in productos:
-        html += f"<li><strong>ID:</strong> {p.id_producto} | <strong>Nombre:</strong> {p.nombre} | <strong>Imagen:</strong> {p.foto_producto}</li>"
-    html += "</ul>"
+        img_path = url_for('static', filename='img/' + p.foto_producto) if p.foto_producto else url_for('static', filename='img/no-image.png')
+        html += f"""
+        <div style='margin-bottom:20px;'>
+            <strong>ID:</strong> {p.id_producto} <br>
+            <strong>Nombre:</strong> {p.nombre} <br>
+            <strong>Imagen:</strong><br>
+            <img src='{img_path}' alt='{p.nombre}' style='max-width:200px; border:1px solid #ccc;'>
+        </div>
+        """
     return html
 
 # -----------------------
