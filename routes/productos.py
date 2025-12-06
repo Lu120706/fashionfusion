@@ -110,10 +110,10 @@ def admin_edit_product(id_producto):
                 filename = secure_filename(f.filename)
                 ts = datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")
                 filename = f"{ts}_{filename}"
-                upload_path = os.path.join(current_app.static_folder, 'uploads', 'productos')
+                upload_path = os.path.join(current_app.static_folder, 'img')
                 os.makedirs(upload_path, exist_ok=True)
                 f.save(os.path.join(upload_path, filename))
-                producto.foto_producto = os.path.join('uploads', 'productos', filename)
+                foto_filename = filename
 
         try:
             db.session.commit()
