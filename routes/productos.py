@@ -165,7 +165,16 @@ def imagen(pid):
     default_path = os.path.join(current_app.static_folder, "no-image.png")
     with open(default_path, "rb") as f:
         return Response(f.read(), mimetype="image/png")
-
+    
+@productos_bp.route('/debug/productos')
+@role_required(1)
+def debug_productos():
+    productos = Producto.query.all()
+    html = "<h2>Debug: Productos y rutas de imagen</h2><ul>"
+    for p in productos:
+        html += f"<li><strong>ID:</strong> {p.id_producto} | <strong>Nombre:</strong> {p.nombre} | <strong>Imagen:</strong> {p.foto_producto}</li>"
+    html += "</ul>"
+    return html
 
 # -----------------------
 # CATÁLOGO (CLIENTE)
