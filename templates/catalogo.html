@@ -11,7 +11,7 @@
 
         <!-- Imagen clickeable para agrandar -->
         {% set img_path = 'img/' ~ p.foto_producto if p.foto_producto else 'img/no-image.png' %}
-        <img src="{{ url_for('static', filename=img_path) }}"
+        <img src="{{ url_for('static', filename=img_path) }}">
              class="card-img-top img-click"
              alt="{{ p.nombre }}"
              style="height:250px;object-fit:cover; cursor:pointer;"

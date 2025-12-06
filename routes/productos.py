@@ -49,8 +49,6 @@ def admin_create_product():
             f = request.files['foto_producto']
             if f and f.filename:
                 filename = secure_filename(f.filename)
-                ts = datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")
-                filename = f"{ts}_{filename}"
                 upload_path = os.path.join(current_app.static_folder, 'img')
                 os.makedirs(upload_path, exist_ok=True)
                 f.save(os.path.join(upload_path, filename))
