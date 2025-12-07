@@ -39,6 +39,12 @@
             </div>
             <button type="submit" class="btn btn-dark w-100">Añadir al carrito</button>
           </form>
+
+          <!-- Boton reseñas -->
+          <a href="{{ url_for('productos.detalle_producto', id_producto=p.id_producto) }}" 
+              class="btn btn-outline-primary btn-sm">
+            Ver detalles y reseñas
+          </a>
         </div>
       </div>
     </div>
@@ -70,9 +76,5 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 </script>
-
-<a href="{{ url_for('productos.detalle_producto', id_producto=p.id_producto) }}" class="btn btn-outline-primary btn-sm">
-  Ver detalles y reseñas
-</a>
 
 {% endblock %}
