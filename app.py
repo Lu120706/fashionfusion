@@ -11,7 +11,8 @@ from routes import (
     rol_bp,
     usuarios_bp,
     carrito_bp,
-    home_bp
+    home_bp,
+    resenas_bp
 )
 from globals import SHOPPING_CARTS
 from flask import session
@@ -45,6 +46,7 @@ def create_app():
     app.register_blueprint(carrito_bp)
     app.register_blueprint(home_bp)
     app.register_blueprint(pedidos_bp)
+    app.register_blueprint(resenas_bp)
 
     # Crear las tablas si no existen
     with app.app_context():

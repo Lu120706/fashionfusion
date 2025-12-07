@@ -5,7 +5,8 @@ from .productos import productos_bp
 from .registro import registro_bp
 from .rol import rol_bp
 from .usuarios import usuarios_bp
-from .home import home_bp   # <- agregado
+from .home import home_bp
+from .resenas import resenas_bp
 
 # Lista de blueprints disponibles (opcional, útil para registro dinámico)
 __all__ = [
@@ -16,5 +17,6 @@ __all__ = [
     'registro_bp',
     'rol_bp',
     'usuarios_bp',
-    'home_bp'   # <- agregado
+    'home_bp',
+    'resenas_bp'
 ]

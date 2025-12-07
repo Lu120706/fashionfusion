@@ -194,3 +194,8 @@ def catalogo():
 def detalle(pid):
     product = Producto.query.get_or_404(pid)
     return render_template("productos.html", product=product)
+
+@productos_bp.route('/detalle/<int:id_producto>')
+def detalle_producto(id_producto):
+    producto = Producto.query.get_or_404(id_producto)
+    return render_template('detalle_producto.html', product=producto)

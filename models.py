@@ -89,4 +89,16 @@ class Pedido(db.Model):
     def __repr__(self):
         return f"<Pedido {self.producto} - {self.talla}>"
 
+class Resena(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    id_producto = db.Column(db.Integer, db.ForeignKey('producto.id_producto'))
+    calidad = db.Column(db.Integer)
+    comodidad = db.Column(db.Integer)
+    comentario = db.Column(db.Text)
+    foto = db.Column(db.String(255))
+    usuario = db.Column(db.String(100))
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+
+    producto = db.relationship('Producto', backref='resenas')
+
 

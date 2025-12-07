@@ -71,4 +71,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
+<a href="{{ url_for('productos.detalle_producto', id_producto=p.id_producto) }}" class="btn btn-outline-primary btn-sm">
+  Ver detalles y reseñas
+</a>
+
 {% endblock %}
