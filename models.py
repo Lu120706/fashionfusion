@@ -99,6 +99,6 @@ class Resena(db.Model):
     usuario = db.Column(db.String(100))
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
-    producto = db.relationship('Producto', backref='resenas')
+    producto = db.relationship('productos', backref='resenas')
 
 
