@@ -91,7 +91,7 @@ class Pedido(db.Model):
 
 class Resena(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    id_producto = db.Column(db.Integer, db.ForeignKey('producto.id_producto'))
+    id_producto = db.Column(db.Integer, db.ForeignKey('productos.id_producto'))
     calidad = db.Column(db.Integer)
     comodidad = db.Column(db.Integer)
     comentario = db.Column(db.Text)
