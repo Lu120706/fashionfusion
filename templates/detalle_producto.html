@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Reseñas{% endblock %}
+{% block content %}
+<div class="container my-5">
+  <h2 class="mb-4">{{ product.nombre }}</h2>
+
+  <!-- Imagen y datos del producto -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <img src="{{ url_for('static', filename='img/' ~ product.foto_producto) }}" 
+           alt="{{ product.nombre }}" class="img-fluid rounded">
+    </div>
+    <div class="col-md-8">
+      <p><strong>Categoría:</strong> {{ product.categoria }}</p>
+      <p><strong>Talla:</strong> {{ product.talla }}</p>
+      <p><strong>Precio:</strong> ${{ "%.2f"|format(product.precio_producto) }}</p>
+      <p><strong>Stock:</strong> {{ product.stock }}</p>
+    </div>
+  </div>
+
+  <!-- Sección de reseñas -->
+  <hr class="my-4">
+  <div id="productReviewSection">
+    <h4 class="mb-3">Reseñas</h4>
+
+    {% if current_user.is_authenticated %}
+    <form method="POST" action="{{ url_for('resenas.guardar_resena') }}" enctype="multipart/form-data" class="mb-4">
+      <input type="hidden" name="id_producto" value="{{ product.id_producto }}">
+
+      <div class="mb-2">
+        <label class="form-label">Calidad</label>
+        <select name="calidad" class="form-select">
+          <option value="5">★★★★★</option>
+          <option value="4">★★★★</option>
+          <option value="3">★★★</option>
+          <option value="2">★★</option>
+          <option value="1">★</option>
+        </select>
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label">Comodidad</label>
+        <select name="comodidad" class="form-select">
+          <option value="5">★★★★★</option>
+          <option value="4">★★★★</option>
+          <option value="3">★★★</option>
+          <option value="2">★★</option>
+          <option value="1">★</option>
+        </select>
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label">Comentario</label>
+        <textarea name="comentario" class="form-control" rows="3"></textarea>
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label">Foto (opcional)</label>
+        <input type="file" name="foto" accept="image/*" class="form-control">
+      </div>
+
+      <button type="submit" class="btn btn-success">Enviar reseña</button>
+    </form>
+    {% else %}
+      <p><a href="{{ url_for('registro.login') }}">Inicia sesión</a> para dejar una reseña.</p>
+    {% endif %}
+
+    <!-- Listado de reseñas -->
+    {% if product.resenas %}
+      {% for r in product.resenas %}
+      <div class="border rounded p-3 mb-3">
+        <strong>{{ r.usuario }}</strong> — <span class="text-muted">{{ r.fecha.strftime('%Y-%m-%d') }}</span><br>
+        <span>⭐ Calidad: {{ r.calidad }} | Comodidad: {{ r.comodidad }}</span>
+        <p class="mt-2">{{ r.comentario }}</p>
+        {% if r.foto %}
+          <img src="{{ url_for('static', filename='img/resenas/' ~ r.foto) }}" class="img-fluid rounded" style="max-width:200px;">
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-muted">Todavía no hay reseñas para este producto.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
