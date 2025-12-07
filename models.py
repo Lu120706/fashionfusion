@@ -74,9 +74,6 @@ class FacturaItem(db.Model):
     def calcular_subtotal(self):
         self.subtotal = self.cantidad * self.precio_unitario
 
-
-
-
 class Pedido(db.Model):
     __tablename__ = 'pedido'
     id = db.Column(db.Integer, primary_key=True)
