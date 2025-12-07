@@ -22,7 +22,6 @@
             <tr class="text-center">
               <th>Producto</th>
               <th>Talla</th>
-              <th>Color</th>
               <th>Cantidad</th>
               <th>Precio Unitario</th>
               <th>Subtotal</th>
@@ -33,7 +32,6 @@
             <tr>
               <td>{{ item.nombre_producto }}</td>
               <td class="text-center">{{ item.talla or '-' }}</td>
-              <td class="text-center">{{ item.color or '-' }}</td>
               <td class="text-center">{{ item.cantidad }}</td>
               <td class="text-center">${{ "%.2f"|format(item.precio_unitario) }}</td>
               <td class="text-center">${{ "%.2f"|format(item.subtotal) }}</td>
