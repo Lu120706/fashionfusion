@@ -1,71 +1,77 @@
 {% extends "base.html" %}
 {% block title %}Carrito{% endblock %}
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-4">
   <div class="card shadow-lg border rounded-3">
     <div class="card-body">
       <h2 class="mb-4 text-center">🛒 Carrito de Compras</h2>
 
       {% if carrito %}
-      <table class="table table-bordered align-middle">
-        <thead class="table-light">
-          <tr class="text-center">
-            <th>Producto</th>
-            <th>Talla</th>
-            <th>Precio</th>
-            <th>Cantidad</th>
-            <th>Subtotal</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in carrito %}
-          <tr>
-            <td class="align-middle">
-              <!-- Imagen del producto -->
-              <img src="{{ item.imagen }}" 
-                   alt="{{ item.nombre }}" style="width: 60px; height: auto; margin-right: 10px;">
-              {{ item.nombre }}
-            </td>
-            <td class="text-center align-middle">{{ item.talla }}</td>
-            <td class="text-center align-middle">${{ "%.2f"|format(item.precio) }}</td>
-
-            <td class="text-center align-middle">
-              <div class="d-flex justify-content-center align-items-center">
-                <form action="{{ url_for('carrito.update_cart') }}" method="POST" class="d-inline me-1">
+      <!-- Tabla responsiva -->
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle text-center">
+          <thead class="table-dark">
+            <tr>
+              <th>Producto</th>
+              <th>Talla</th>
+              <th>Precio</th>
+              <th>Cantidad</th>
+              <th>Subtotal</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in carrito %}
+            <tr>
+              <td class="align-middle">
+                <div class="d-flex flex-column flex-sm-row align-items-center">
+                  <img src="{{ item.imagen }}" 
+                       alt="{{ item.nombre }}" 
+                       class="img-fluid mb-2 mb-sm-0 me-sm-2" 
+                       style="max-width: 70px; height: auto;">
+                  <span>{{ item.nombre }}</span>
+                </div>
+              </td>
+              <td>{{ item.talla }}</td>
+              <td>${{ "%.2f"|format(item.precio) }}</td>
+              <td>
+                <div class="d-flex justify-content-center align-items-center">
+                  <form action="{{ url_for('carrito.update_cart') }}" method="POST" class="d-inline">
+                    <input type="hidden" name="key" value="{{ item.key }}">
+                    <input type="hidden" name="action" value="decrease">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">-</button>
+                  </form>
+                  <span class="mx-2">{{ item.cantidad }}</span>
+                  <form action="{{ url_for('carrito.update_cart') }}" method="POST" class="d-inline">
+                    <input type="hidden" name="key" value="{{ item.key }}">
+                    <input type="hidden" name="action" value="increase">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">+</button>
+                  </form>
+                </div>
+              </td>
+              <td>${{ "%.2f"|format(item.subtotal) }}</td>
+              <td>
+                <form action="{{ url_for('carrito.remove_from_cart') }}" method="POST">
                   <input type="hidden" name="key" value="{{ item.key }}">
-                  <input type="hidden" name="action" value="decrease">
-                  <button type="submit" class="btn btn-sm btn-outline-secondary">-</button>
+                  <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
                 </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
 
-                <span class="mx-2 align-middle">{{ item.cantidad }}</span>
-
-                <form action="{{ url_for('carrito.update_cart') }}" method="POST" class="d-inline ms-1">
-                  <input type="hidden" name="key" value="{{ item.key }}">
-                  <input type="hidden" name="action" value="increase">
-                  <button type="submit" class="btn btn-sm btn-outline-secondary">+</button>
-                </form>
-              </div>
-            </td>
-
-            <td class="text-center align-middle">${{ "%.2f"|format(item.subtotal) }}</td>
-
-            <td class="text-center align-middle">
-              <form action="{{ url_for('carrito.remove_from_cart') }}" method="POST">
-                <input type="hidden" name="key" value="{{ item.key }}">
-                <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-              </form>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      
-      <div class="d-flex justify-content-between align-items-center mt-4">
-        <h4>Total: <span class="text-success">${{ "%.2f"|format(total) }}</span></h4>
-        <form action="{{ url_for('carrito.cart_checkout') }}" method="POST" class="d-flex">
-          <input type="text" name="direccion_envio" placeholder="Dirección de envío" class="form-control me-2" required>
-          <button type="submit" class="btn btn-success">Proceder al pago</button>
+      <!-- Total y checkout -->
+      <div class="mt-4">
+        <h4 class="text-end">Total: <span class="text-success">${{ "%.2f"|format(total) }}</span></h4>
+        <form action="{{ url_for('carrito.cart_checkout') }}" method="POST" class="row g-2 mt-3">
+          <div class="col-12 col-md-8">
+            <input type="text" name="direccion_envio" placeholder="Dirección de envío" class="form-control" required>
+          </div>
+          <div class="col-12 col-md-4 d-grid">
+            <button type="submit" class="btn btn-success">Proceder al pago</button>
+          </div>
         </form>
       </div>
       {% else %}

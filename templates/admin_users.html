@@ -1,37 +1,55 @@
 {% extends "base.html" %}
 {% block title %}Gestión de Usuarios{% endblock %}
 {% block content %}
-<div class="container my-5">
-  <h2 class="mb-4">Gestión de Usuarios</h2>
-  <a class="btn btn-success mb-3" href="{{ url_for('usuarios.admin_create_user') }}">➕ Crear usuario</a>
-  <table class="table table-bordered table-striped">
-    <thead class="table-dark">
-      <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Correo</th>
-        <th>Rol</th>
-        <th>Creado</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for u in users %}
-      <tr>
-        <td>{{ u.id_usuario }}</td>
-        <td>{{ u.nombre }}</td>
-        <td>{{ u.correo }}</td>
-        <td>{{ u.id_rol }}</td>
-        <td>{{ u.creado_en.strftime('%Y-%m-%d %H:%M') if u.creado_en else '' }}</td>
-        <td>
-          <a class="btn btn-sm btn-primary" href="{{ url_for('usuarios.admin_edit_user', id_usuario=u.id_usuario) }}">Editar</a>
-          <form method="POST" action="{{ url_for('usuarios.admin_delete_user', id_usuario=u.id_usuario) }}" style="display:inline;" onsubmit="return confirm('¿Eliminar usuario?');">
-            <button class="btn btn-sm btn-danger">Eliminar</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<div class="container mt-4">
+  <div class="card shadow-lg border rounded-3">
+    <div class="card-body">
+      <h2 class="mb-4 text-center">👥 Gestión de Usuarios</h2>
+
+      <!-- Botón crear usuario -->
+      <div class="d-grid mb-3">
+        <a class="btn btn-success" href="{{ url_for('usuarios.admin_create_user') }}">➕ Crear usuario</a>
+      </div>
+
+      {% if users %}
+      <!-- Tabla responsiva -->
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle text-center">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Rol</th>
+              <th>Creado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+            <tr>
+              <td>{{ u.id_usuario }}</td>
+              <td class="text-break">{{ u.nombre }}</td>
+              <td class="text-break">{{ u.correo }}</td>
+              <td>{{ u.id_rol }}</td>
+              <td>{{ u.creado_en.strftime('%Y-%m-%d %H:%M') if u.creado_en else '' }}</td>
+              <td>
+                <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+                  <a class="btn btn-sm btn-primary" href="{{ url_for('usuarios.admin_edit_user', id_usuario=u.id_usuario) }}">Editar</a>
+                  <form method="POST" action="{{ url_for('usuarios.admin_delete_user', id_usuario=u.id_usuario) }}" class="d-inline" onsubmit="return confirm('¿Eliminar usuario?');">
+                    <button class="btn btn-sm btn-danger">Eliminar</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-center text-muted">No hay usuarios registrados aún.</p>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}
