@@ -6,6 +6,14 @@
     <div class="card-body">
       <h2 class="mb-4 text-center">📦 Gestión de Pedidos</h2>
 
+      <!-- Botón global para eliminar todos -->
+      <div class="d-flex justify-content-end mb-3">
+        <form method="POST" action="{{ url_for('pedidos.eliminar_todos_pedidos') }}" 
+              onsubmit="return confirm('⚠️ ¿Seguro que deseas eliminar TODOS los pedidos? Esta acción no se puede deshacer.');">
+          <button type="submit" class="btn btn-danger">🗑️ Eliminar todos</button>
+        </form>
+      </div>
+
       {% if pedidos %}
       <!-- Tabla responsiva -->
       <div class="table-responsive">
@@ -31,13 +39,22 @@
                 </span>
               </td>
               <td>
-                <form method="POST" action="{{ url_for('pedidos.cambiar_estado_pedido', pedido_id=pedido.id) }}" class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
-                  <select name="estado" class="form-select form-select-sm w-auto">
-                    <option value="pendiente" {% if pedido.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
-                    <option value="finalizado" {% if pedido.estado == 'finalizado' %}selected{% endif %}>Finalizado</option>
-                  </select>
-                  <button type="submit" class="btn btn-sm btn-primary">Actualizar</button>
-                </form>
+                <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+                  <!-- Form para cambiar estado -->
+                  <form method="POST" action="{{ url_for('pedidos.cambiar_estado_pedido', pedido_id=pedido.id) }}" class="d-flex flex-column flex-sm-row gap-2">
+                    <select name="estado" class="form-select form-select-sm w-auto">
+                      <option value="pendiente" {% if pedido.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                      <option value="finalizado" {% if pedido.estado == 'finalizado' %}selected{% endif %}>Finalizado</option>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-primary">Actualizar</button>
+                  </form>
+
+                  <!-- Form para eliminar pedido individual -->
+                  <form method="POST" action="{{ url_for('pedidos.eliminar_pedido', pedido_id=pedido.id) }}" 
+                        onsubmit="return confirm('¿Eliminar este pedido?');">
+                    <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                  </form>
+                </div>
               </td>
             </tr>
             {% endfor %}
