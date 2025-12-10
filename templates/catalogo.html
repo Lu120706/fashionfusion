@@ -54,10 +54,12 @@
 
 <!-- Modal para ampliar la imagen -->
 <div class="modal fade" id="imgModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content bg-dark">
       <div class="modal-body p-0 text-center">
-        <img id="modalImg" src="" class="img-fluid rounded">
+        <!-- Ajuste de tamaño máximo -->
+        <img id="modalImg" src="" class="img-fluid rounded" 
+             style="max-width:90vw; max-height:80vh; object-fit:contain;">
       </div>
     </div>
   </div>
